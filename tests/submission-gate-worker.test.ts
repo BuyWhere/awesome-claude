@@ -592,7 +592,7 @@ describe("Cloudflare submission gate helpers", () => {
     ).toContain("> ## ℹ️ Superseded gate report");
   });
 
-  it("keeps clean default-confidence merge verdicts on the merge path", () => {
+  it("routes clean below-floor private merge verdicts to manual review", () => {
     const decision = enforceAutoMergeConfidenceFloor({
       schemaVersion: 2,
       verdict: "merge",
@@ -611,11 +611,17 @@ describe("Cloudflare submission gate helpers", () => {
     });
 
     expect(decision).toMatchObject({
-      verdict: "merge",
+      verdict: "manual",
       confidence: 0.76,
-      labels: ["submission-merged-by-gate"],
+      labels: ["submission-manual-review"],
+      errors: [
+        {
+          code: "low_private_review_confidence",
+          retryable: false,
+        },
+      ],
     });
-    expect(decision.errors).toBeUndefined();
+    expect(decision.summary).toContain("unattended merge floor is 85%");
   });
 
   it("routes ambiguous low-confidence private merge verdicts to manual review", () => {
