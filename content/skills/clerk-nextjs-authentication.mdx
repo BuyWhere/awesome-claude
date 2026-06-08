@@ -22,7 +22,7 @@ dateAdded: "2026-06-04"
 submittedAt: "2026-06-04"
 repoUrl: "https://github.com/clerk/javascript"
 documentationUrl: "https://clerk.com/docs/nextjs/getting-started/quickstart"
-downloadUrl: "https://github.com/clerk/javascript/archive/refs/heads/main.zip"
+downloadUrl: "https://github.com/clerk/javascript/archive/refs/tags/@clerk/nextjs@7.4.3.zip"
 installable: true
 installCommand: "pnpm add @clerk/nextjs"
 usageSnippet: >-
@@ -60,7 +60,7 @@ prerequisites:
   - "Decision on whether to use Clerk hosted Account Portal pages, custom sign-in/sign-up pages, or both."
   - "Production domain, redirect URL, callback URL, and allowed origin plan."
 safetyNotes:
-  - "The download URL is Clerk's external JavaScript SDK source archive, not a HeyClaude-packaged skill archive; review source provenance before using it in automated workflows."
+  - "The download URL is Clerk's external JavaScript SDK source archive pinned to the `@clerk/nextjs@7.4.3` tag, not a HeyClaude-packaged skill archive; review source provenance before using it in automated workflows."
   - "Clerk middleware does not protect routes by default; require an explicit protected-route matcher before assuming a page, API route, or tRPC endpoint is private."
   - "Do not commit `CLERK_SECRET_KEY`, webhook signing secrets, OAuth provider secrets, or copied dashboard values to source control, issue comments, screenshots, or chat transcripts."
   - "Review middleware matchers carefully. A broad matcher can affect static assets and public routes, while a narrow matcher can leave sensitive routes unauthenticated."
