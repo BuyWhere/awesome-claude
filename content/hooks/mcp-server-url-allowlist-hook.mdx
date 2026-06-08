@@ -43,7 +43,7 @@ installCommand: |-
     *) exit 0 ;;
   esac
 
-  hosts=$(printf '%s' "$text" | grep -Eo 'https?://[^"[:space:]]+' | awk -F/ '{print $3}' | sort -u)
+  hosts=$(printf '%s' "$text" | sed 's#\\/#/#g' | grep -Eo 'https?://[^"[:space:]]+' | awk -F/ '{print $3}' | sort -u)
   [ -z "$hosts" ] && exit 0
 
   allowlist=$(printf '%s' "${ALLOWED_MCP_HOSTS:-}" | tr ',' ' ')
@@ -117,7 +117,7 @@ scriptBody: |-
     *) exit 0 ;;
   esac
 
-  hosts=$(printf '%s' "$text" | grep -Eo 'https?://[^"[:space:]]+' | awk -F/ '{print $3}' | sort -u)
+  hosts=$(printf '%s' "$text" | sed 's#\\/#/#g' | grep -Eo 'https?://[^"[:space:]]+' | awk -F/ '{print $3}' | sort -u)
   [ -z "$hosts" ] && exit 0
 
   allowlist=$(printf '%s' "${ALLOWED_MCP_HOSTS:-}" | tr ',' ' ')
