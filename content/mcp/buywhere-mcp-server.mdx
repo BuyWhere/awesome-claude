@@ -1,0 +1,169 @@
+---
+title: BuyWhere MCP Server
+slug: buywhere-mcp-server
+category: mcp
+description: >-
+  Real-time product search and price comparison MCP server for Singapore and
+  Southeast Asia. Search 260,000+ products across Lazada, Shopee, Courts,
+  FairPrice, and other major SEA merchants. Returns live prices, stock
+  availability, product details, and cross-merchant comparison results.
+cardDescription: >-
+  Search 260K+ Singapore and SEA products with live prices and availability
+  from Lazada, Shopee, Courts, FairPrice, and more.
+seoTitle: BuyWhere MCP Server — Singapore & SEA Product Search
+seoDescription: >-
+  Use BuyWhere MCP with Claude to search Singapore and Southeast Asia product
+  prices in real-time. Covers Lazada, Shopee, Courts, FairPrice, and 260K+
+  products.
+author: BuyWhere
+authorProfileUrl: "https://buywhere.ai/"
+submittedBy: buywhere-bot
+submittedByUrl: "https://github.com/BuyWhere"
+dateAdded: "2026-06-11"
+documentationUrl: "https://github.com/BuyWhere/buywhere-mcp"
+repoUrl: "https://github.com/BuyWhere/buywhere-mcp"
+installable: true
+installCommand: "npx -y @buywhere/mcp-server"
+usageSnippet: "BUYWHERE_API_KEY=your-key npx -y @buywhere/mcp-server"
+copySnippet: |-
+  {
+    "mcpServers": {
+      "buywhere": {
+        "command": "npx",
+        "args": ["-y", "@buywhere/mcp-server"],
+        "env": {
+          "BUYWHERE_API_KEY": "your-api-key"
+        }
+      }
+    }
+  }
+configSnippet: |-
+  {
+    "mcpServers": {
+      "buywhere": {
+        "command": "npx",
+        "args": ["-y", "@buywhere/mcp-server"],
+        "env": {
+          "BUYWHERE_API_KEY": "your-api-key"
+        }
+      }
+    }
+  }
+estimatedSetupTime: 5 minutes
+difficulty: beginner
+prerequisites:
+  - Node.js 18 or later to run the npx package.
+  - BuyWhere API key — free and instant at https://buywhere.ai/api-keys, no waitlist.
+  - MCP-capable client such as Claude Code, Claude Desktop, CrewAI, Mastra, or another stdio-compatible client.
+safetyNotes:
+  - BuyWhere MCP makes read-only product search calls to the BuyWhere API. It does not write to external systems, modify files, or execute code beyond fetching product data.
+  - The server does not accept payment information or execute purchases. It is a product discovery and comparison tool only.
+  - API key is passed as an environment variable and is not logged by the server, but may appear in MCP client logs or shell history.
+privacyNotes:
+  - Search queries are sent to BuyWhere's hosted API at api.buywhere.ai. Query text, result set, and session identifiers may be logged per BuyWhere's privacy policy.
+  - Product search results include publicly available merchant data (prices, stock levels, product names). No personal or user data is processed by the server.
+  - The BUYWHERE_API_KEY environment variable is transmitted with each request to authenticate the caller. Treat it as a credential.
+tags:
+  - ecommerce
+  - singapore
+  - sea
+  - product-search
+  - price-comparison
+  - mcp
+keywords:
+  - buywhere mcp
+  - singapore product search
+  - sea price comparison
+  - lazada mcp
+  - shopee mcp
+  - "@buywhere/mcp-server"
+  - southeast asia ecommerce
+robotsIndex: true
+robotsFollow: true
+---
+
+## Content
+
+BuyWhere MCP Server gives Claude and other MCP-compatible agents real-time
+product search and price comparison across Singapore and Southeast Asia. It
+connects to BuyWhere's catalog of 260,000+ products from major SEA merchants
+including Lazada, Shopee, Courts, FairPrice, and others.
+
+Use it when the assistant needs current product prices, stock availability, or
+cross-merchant comparison for Singapore or SEA shopping queries. Results include
+live data fetched at query time, not cached snapshots.
+
+## Features
+
+- Real-time product search by name, category, or keywords across 260K+ products.
+- Cross-merchant price comparison in a single query spanning Lazada, Shopee, Courts, FairPrice, and other major SEA merchants.
+- Live stock availability and product status.
+- Product details including images, brand, merchant name, and direct product URLs.
+- Self-serve free API keys with instant issuance at buywhere.ai/api-keys.
+- Compatible with Claude Desktop, Claude Code, CrewAI, Mastra, and any stdio MCP client.
+
+## Use Cases
+
+- Ask Claude to compare prices for a specific product across Singapore merchants.
+- Build a shopping assistant that surfaces real product availability and current prices.
+- Research product options and price ranges in the Singapore market before making purchasing decisions.
+- Integrate live SEA product data into a multi-step AI agent workflow.
+
+## Installation
+
+### Claude Code
+
+```bash
+claude mcp add --transport stdio buywhere -- npx -y @buywhere/mcp-server
+```
+
+Set the API key:
+
+```bash
+export BUYWHERE_API_KEY=your-api-key
+```
+
+Or configure it directly in the MCP JSON.
+
+### Claude Desktop
+
+Add to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "buywhere": {
+      "command": "npx",
+      "args": ["-y", "@buywhere/mcp-server"],
+      "env": {
+        "BUYWHERE_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## Getting an API Key
+
+1. Go to https://buywhere.ai/api-keys
+2. Enter your email address
+3. Key is issued immediately — no waitlist, no credit card
+
+## Source Notes
+
+- Repository: https://github.com/BuyWhere/buywhere-mcp
+- npm package: `@buywhere/mcp-server`
+- Remote MCP endpoint: `https://mcp.buywhere.ai/mcp`
+- License: MIT
+- API key required; free tier available.
+
+## Duplicate Check
+
+- Checked for existing BuyWhere entries, buywhere.ai, and @buywhere/mcp-server.
+- No existing entry found in the heyclau.de MCP directory before submission.
+
+## Disclosure
+
+This entry was submitted by the BuyWhere team. BuyWhere is a commercial
+product search API. The free API tier is available without payment. This is not
+a paid placement or sponsorship.
