@@ -1,0 +1,65 @@
+---
+title: BuyWhere MCP Server
+slug: buywhere-mcp
+category: mcp
+description: >-
+  Real-time product search and price-comparison MCP server for AI agents. 11M+ products across Shopee, Lazada, Amazon, Walmart, and 20+ retailers in Singapore, SEA, and US. Exposes 7 tools: search_products, get_product, compare_products, find_best_price, get_deals, list_categories, find_similar.
+cardDescription: >-
+  Connect Claude to real-time product pricing across 11M+ products in Shopee, Lazada, Amazon, Walmart, and 20+ retailers in Singapore, SEA, and US.
+seoTitle: BuyWhere MCP Server for Claude
+seoDescription: >-
+  Use BuyWhere MCP Server (api.buywhere.ai/mcp) with Claude to search 11M+ products in real time, compare prices across merchants, find the cheapest in-stock listing, and discover active deals across Shopee, Lazada, Amazon, and Walmart in Singapore, SEA, and US. Free API key with no signup flow.
+author: BuyWhere
+authorProfileUrl: "https://github.com/BuyWhere"
+submittedBy: BuyWhere
+submittedByUrl: "https://github.com/BuyWhere"
+dateAdded: "2026-06-26"
+brandName: BuyWhere MCP
+brandDomain: buywhere.ai
+websiteUrl: "https://buywhere.ai"
+repoUrl: "https://github.com/BuyWhere/buywhere-mcp"
+documentationUrl: "https://github.com/BuyWhere/buywhere-mcp/blob/main/README.md"
+installable: true
+installCommand: >-
+  claude mcp add --transport http buywhere https://api.buywhere.ai/mcp --header "Authorization: Bearer YOUR_BUYWHERE_API_KEY"
+usageSnippet: >-
+  Register a free API key at https://api.buywhere.ai/v1/auth/register (no signup, 3 seconds), then add the BuyWhere MCP server with the install command above. Use search_products, get_product, compare_products, find_best_price, get_deals, list_categories, and find_similar to research shopping queries across Singapore and Southeast Asia.
+copySnippet: |-
+  {
+    "mcpServers": {
+      "buywhere": {
+        "url": "https://api.buywhere.ai/mcp",
+        "type": "http",
+        "headers": {
+          "Authorization": "Bearer YOUR_BUYWHERE_API_KEY"
+        }
+      }
+    }
+  }
+configSnippet: |-
+  {
+    "mcpServers": {
+      "buywhere": {
+        "url": "https://api.buywhere.ai/mcp",
+        "type": "http",
+        "headers": {
+          "Authorization": "Bearer YOUR_BUYWHERE_API_KEY"
+        }
+      }
+    }
+  }
+retrievalSources:
+  - "https://buywhere.ai"
+  - "https://github.com/BuyWhere/buywhere-mcp"
+  - "https://registry.modelcontextprotocol.io"
+  - "https://modelcontextprotocol.io"
+tags:
+  - e-commerce
+  - product-search
+  - price-comparison
+  - shopping
+  - cross-border
+  - retail
+  - singapore
+  - southeast-asia
+---
