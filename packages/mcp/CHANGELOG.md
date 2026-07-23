@@ -1,5 +1,20 @@
 # @heyclaude/mcp Changelog
 
+## [0.13.0](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.12.1...mcp-v0.13.0) (2026-07-23)
+
+
+### Features
+
+* **mcp:** let registry.updates filter by platform like search/list ([#5485](https://github.com/JSONbored/awesome-claude/issues/5485)) ([e710d1b](https://github.com/JSONbored/awesome-claude/commit/e710d1b0f13aee3f8153283babac8ce4ad8057e7))
+
+
+### Bug Fixes
+
+* **mcp:** align schema .d.ts with schemas-lib.js runtime exports ([#5495](https://github.com/JSONbored/awesome-claude/issues/5495)) ([8bda438](https://github.com/JSONbored/awesome-claude/commit/8bda438e15f326d3bbab87cd848b2f98d5b3d33b)), closes [#5482](https://github.com/JSONbored/awesome-claude/issues/5482)
+* **mcp:** distinguish graph 'zero relations' from missing graph data in getRelatedEntries ([#5486](https://github.com/JSONbored/awesome-claude/issues/5486)) ([0371cd9](https://github.com/JSONbored/awesome-claude/commit/0371cd92449733c9e254c441fb1039a07ba0d5f2)), closes [#5461](https://github.com/JSONbored/awesome-claude/issues/5461)
+* **mcp:** fall back to commandSyntax for entry.asset install command ([#5484](https://github.com/JSONbored/awesome-claude/issues/5484)) ([ee9f0de](https://github.com/JSONbored/awesome-claude/commit/ee9f0de6fec0dc311723090806e786f1aad4523e))
+* **mcp:** return a clean error envelope when resource artifact reads fail ([#5490](https://github.com/JSONbored/awesome-claude/issues/5490)) ([cd71835](https://github.com/JSONbored/awesome-claude/commit/cd7183511d88c84cfa921d8aef89571f521b9ffa))
+
 ## [0.12.1](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.12.0...mcp-v0.12.1) (2026-07-22)
 
 
