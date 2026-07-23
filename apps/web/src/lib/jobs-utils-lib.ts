@@ -54,6 +54,27 @@ export function isFresh(iso: string, now = Date.now()): boolean {
   return daysSince(iso, now) <= 7;
 }
 
+/** Thousands multiplier for a trailing `k`/`K` compensation shorthand (e.g. `$210k`). */
+const COMPENSATION_K_MULTIPLIER = 1000;
+
+/**
+ * Real-dollar sort value for a free-text compensation string, so mixed-format
+ * listings compare on one scale: `"$210k"` and `"$210,000"` both yield `210000`.
+ *
+ * Ranges sort by their leading figure only (e.g. `"$100k-$150k"` → `100000`) —
+ * a deliberate pre-existing limitation of the salary sort, preserved here.
+ *
+ * Missing / empty compensation sorts last (`-1`); an unparseable string stays at `0`.
+ */
+export function compensationSortValue(compensation?: string | null): number {
+  if (!compensation) return -1;
+  // Capture the optional trailing k/K so `"$210k"` scales to 210000, not 210.
+  const m = compensation.match(/\$?(\d[\d,]*)(k)?/i);
+  if (!m) return 0;
+  const base = parseInt(m[1].replace(/,/g, ""), 10);
+  return m[2] ? base * COMPENSATION_K_MULTIPLIER : base;
+}
+
 export function sortJobs(jobs: JobListing[]): JobListing[] {
   const order: Record<JobListing["tier"], number> = {
     sponsored: 0,
