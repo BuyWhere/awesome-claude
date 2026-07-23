@@ -178,40 +178,45 @@ function ContributorsPage() {
         {rest.map((c, rowIndex) => {
           const destination = contributorsIndexProfileDestination(c.slug);
           if (!destination) return null;
+          // Match the featured "Top contributor" card: outer non-link shell with
+          // profile <Link> and GitHub <a> as siblings (no nested anchors).
           return (
-            <Link
+            <div
               key={c.slug}
-              to={destination.to}
-              params={destination.params}
-              onClick={() =>
-                trackEvent(
-                  contributorsIndexProfileAnalyticsEvent(),
-                  contributorsIndexProfileAnalyticsData(
-                    c.slug,
-                    c.acceptedCount,
-                    rowIndex,
-                    sorted.length,
-                  ),
-                )
-              }
               className="group hover-lift flex items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-[border-color,background-color] duration-200 ease-out hover:border-ink/20 hover:bg-surface-2"
             >
-              <Monogram name={c.name || c.handle} size={40} className="rounded-full" />
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-display text-sm font-semibold text-ink transition-colors duration-200 ease-out group-hover:text-ink-hover">
-                  {c.name}
+              <Link
+                to={destination.to}
+                params={destination.params}
+                onClick={() =>
+                  trackEvent(
+                    contributorsIndexProfileAnalyticsEvent(),
+                    contributorsIndexProfileAnalyticsData(
+                      c.slug,
+                      c.acceptedCount,
+                      rowIndex,
+                      sorted.length,
+                    ),
+                  )
+                }
+                className="flex min-w-0 flex-1 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              >
+                <Monogram name={c.name || c.handle} size={40} className="rounded-full" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-display text-sm font-semibold text-ink transition-colors duration-200 ease-out group-hover:text-ink-hover">
+                    {c.name}
+                  </div>
+                  <div className="truncate text-xs text-ink-muted">
+                    @{c.handle} · {contributorCardSummary(c)}
+                  </div>
                 </div>
-                <div className="truncate text-xs text-ink-muted">
-                  @{c.handle} · {contributorCardSummary(c)}
-                </div>
-              </div>
+              </Link>
               {c.github && (
                 <a
                   href={c.github}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  onClick={() =>
                     trackEvent(
                       contributorsIndexGithubAnalyticsEvent(),
                       contributorsIndexGithubAnalyticsData(
@@ -221,15 +226,15 @@ function ContributorsPage() {
                         rowIndex,
                         sorted.length,
                       ),
-                    );
-                  }}
-                  className="text-ink-subtle hover:text-ink"
+                    )
+                  }
+                  className="shrink-0 text-ink-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                   aria-label={`${c.handle} on GitHub`}
                 >
                   <Github className="h-3.5 w-3.5" />
                 </a>
               )}
-            </Link>
+            </div>
           );
         })}
       </div>
