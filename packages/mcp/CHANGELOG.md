@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.13.2](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.13.1...mcp-v0.13.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **mcp:** stop normalizePlatform mirrors leaking unrecognized input ([#5540](https://github.com/JSONbored/awesome-claude/issues/5540)) ([602a50b](https://github.com/JSONbored/awesome-claude/commit/602a50b4e8bb0d8b49407c6ef947ad04ae9a3297)), closes [#5538](https://github.com/JSONbored/awesome-claude/issues/5538)
+
 ## [0.13.1](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.13.0...mcp-v0.13.1) (2026-07-24)
 
 
