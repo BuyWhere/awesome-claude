@@ -11,6 +11,7 @@ export function savedSearchQueryFromParams(params: URLSearchParams): SavedSearch
     category: params.get("category") ?? undefined,
     trust: params.get("trust") ?? undefined,
     source: params.get("source") ?? undefined,
+    signal: params.get("signal") ?? undefined,
     platform: params.get("platform") ?? undefined,
   };
 }

@@ -13,6 +13,7 @@ describe("applyToBrowseSearch", () => {
       category: "",
       trust: "",
       source: "",
+      signal: "",
       platform: "",
       sort: "popular",
       view: "row",
@@ -27,6 +28,7 @@ describe("applyToBrowseSearch", () => {
         category: "mcp",
         trust: "trusted",
         source: "official",
+        signal: "checksums",
         platform: "claude-code",
       }),
     );
@@ -35,6 +37,7 @@ describe("applyToBrowseSearch", () => {
       category: "mcp",
       trust: "trusted",
       source: "official",
+      signal: "checksums",
       platform: "claude-code",
     });
   });

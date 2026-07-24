@@ -10,6 +10,7 @@ describe("savedSearchQueryFromParams", () => {
         category: "mcp",
         trust: "verified",
         source: "github",
+        signal: "checksums",
         platform: "cursor",
       }),
     );
@@ -18,6 +19,7 @@ describe("savedSearchQueryFromParams", () => {
       category: "mcp",
       trust: "verified",
       source: "github",
+      signal: "checksums",
       platform: "cursor",
     });
   });
@@ -31,6 +33,7 @@ describe("savedSearchQueryFromParams", () => {
       category: undefined,
       trust: undefined,
       source: undefined,
+      signal: undefined,
       platform: undefined,
     });
   });

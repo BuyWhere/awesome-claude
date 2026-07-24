@@ -15,6 +15,7 @@ export function applyToBrowseSearch(s: SavedSearch) {
     category: s.category ?? "",
     trust: s.trust ?? "",
     source: s.source ?? "",
+    signal: s.signal ?? "",
     platform: s.platform ?? "",
     sort: (s.sort as "popular" | "newest" | "title") ?? "popular",
     view: "row" as const,

@@ -366,6 +366,7 @@ describe("applySavedSearch", () => {
       category: "skills",
       trust: "verified",
       source: "official",
+      signal: "checksums",
       platform: "claude-code",
     });
     expect(normalizeSearchQuery).toHaveBeenCalledWith("hello");
@@ -375,6 +376,7 @@ describe("applySavedSearch", () => {
         categories: ["skills"],
         trust: ["verified"],
         source: ["official"],
+        signal: "checksums",
         platforms: ["claude-code"],
       }),
       expect.any(Array),
@@ -391,6 +393,7 @@ describe("applySavedSearch", () => {
         categories: undefined,
         trust: undefined,
         source: undefined,
+        signal: undefined,
         platforms: undefined,
       },
       expect.any(Array),

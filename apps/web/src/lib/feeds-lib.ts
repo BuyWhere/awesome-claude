@@ -14,7 +14,7 @@
  * working unchanged.
  */
 import { ENTRIES } from "@/data/entries";
-import { filterSearchEntries, normalizeSearchQuery } from "@/data/search";
+import { filterSearchEntries, normalizeSearchQuery, type TrustSignalFilter } from "@/data/search";
 import { CHANGELOG, RELEASE_NOTES } from "@/data/changelog";
 import {
   CATEGORIES,
@@ -197,6 +197,7 @@ export interface SavedSearchQuery {
   category?: string;
   trust?: string;
   source?: string;
+  signal?: string;
   platform?: string;
 }
 
@@ -207,6 +208,7 @@ export function applySavedSearch(q: SavedSearchQuery): FeedItem[] {
       categories: q.category ? [q.category as Category] : undefined,
       trust: q.trust ? [q.trust as TrustLevel] : undefined,
       source: q.source ? [q.source as SourceStatus] : undefined,
+      signal: q.signal ? (q.signal as TrustSignalFilter) : undefined,
       platforms: q.platform ? [q.platform as Platform] : undefined,
     },
     ENTRIES,

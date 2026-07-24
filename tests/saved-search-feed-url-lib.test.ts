@@ -18,6 +18,7 @@ describe("savedFeedUrl", () => {
         category: "mcp",
         trust: "trusted",
         source: "official",
+        signal: "checksums",
         platform: "claude-code",
         label: "my feed",
       }),
@@ -27,6 +28,7 @@ describe("savedFeedUrl", () => {
     expect(params.get("category")).toBe("mcp");
     expect(params.get("trust")).toBe("trusted");
     expect(params.get("source")).toBe("official");
+    expect(params.get("signal")).toBe("checksums");
     expect(params.get("platform")).toBe("claude-code");
     expect(params.get("label")).toBe("my feed");
   });
