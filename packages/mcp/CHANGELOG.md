@@ -1,5 +1,13 @@
 # @heyclaude/mcp Changelog
 
+## [0.13.1](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.13.0...mcp-v0.13.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* **mcp:** reject reserved GitHub owners in isPublicGitHubProfileUrl ([1089afe](https://github.com/JSONbored/awesome-claude/commit/1089afeefb0fccd8b4a327ba883b816c49db703c))
+* **mcp:** reject reserved GitHub owners in isPublicGitHubProfileUrl ([5162fbf](https://github.com/JSONbored/awesome-claude/commit/5162fbf14b93fa73151318cdb25ae3712e236619)), closes [#5507](https://github.com/JSONbored/awesome-claude/issues/5507)
+
 ## [0.13.0](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.12.1...mcp-v0.13.0) (2026-07-23)
 
 
