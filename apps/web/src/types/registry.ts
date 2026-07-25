@@ -225,6 +225,13 @@ export interface Entry extends Provenance, BrandInfo, SkillFields {
   hasPrerequisites?: boolean;
   hasTroubleshooting?: boolean;
   hasBreakingChanges?: boolean;
+  /**
+   * Per-entry search-indexing opt-out (mirrors the registry ContentEntry
+   * field). `false` keeps the entry out of the sitemap
+   * (isSitemapIndexableEntry), noindexes its detail page, and hides it from
+   * the llms.txt surfaces; unset/true means indexable.
+   */
+  robotsIndex?: boolean;
   websiteUrl?: string;
   pricingModel?: string;
   disclosure?: string;

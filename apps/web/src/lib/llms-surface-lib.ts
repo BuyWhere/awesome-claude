@@ -27,6 +27,11 @@ export interface LlmsEntry {
   installCommand?: string;
   configSnippet?: string;
   fullCopy?: string;
+  /**
+   * Per-entry indexing opt-out. `false` keeps the entry out of both llms
+   * surfaces, mirroring `isSitemapIndexableEntry` (sitemap-policy-lib).
+   */
+  robotsIndex?: boolean;
 }
 
 export interface LlmsTxtContext {
@@ -49,8 +54,12 @@ export function buildLlmsTxt(origin: string, context: LlmsTxtContext): string {
   lines.push(`Feeds: ${origin}/feeds`);
   lines.push("");
 
+  // Honor the per-entry `robotsIndex:false` opt-out, mirroring the sitemap's
+  // isSitemapIndexableEntry filter: an entry hidden from the sitemap must not
+  // be published to the llms surfaces either.
+  const listableEntries = context.entries.filter((e) => e.robotsIndex !== false);
   for (const c of context.categories) {
-    const entries = context.entries.filter((e) => e.category === c.id);
+    const entries = listableEntries.filter((e) => e.category === c.id);
     if (entries.length === 0) continue;
     lines.push(`## ${c.label}`);
     lines.push("");
@@ -96,8 +105,10 @@ export function buildLlmsFullTxt(origin: string, context: LlmsFullTxtContext): s
   out.push(`Generated for context windows. Source: ${origin}`);
   out.push("");
 
+  // Same `robotsIndex:false` opt-out as buildLlmsTxt / the sitemap policy.
+  const listableEntries = context.entries.filter((e) => e.robotsIndex !== false);
   for (const c of context.categories) {
-    const entries = context.entries.filter((e) => e.category === c.id);
+    const entries = listableEntries.filter((e) => e.category === c.id);
     if (entries.length === 0) continue;
     out.push(`# ${c.label}`);
     out.push("");
