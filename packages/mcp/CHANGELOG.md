@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.1](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.0...mcp-v0.14.1) (2026-07-26)
+
+
+### Bug Fixes
+
+* **mcp:** share one source URL field list for status and hosts ([#5569](https://github.com/JSONbored/awesome-claude/issues/5569)) ([288f0c9](https://github.com/JSONbored/awesome-claude/commit/288f0c93e983fefb3da085cb461a0191fa9ea70d)), closes [#5560](https://github.com/JSONbored/awesome-claude/issues/5560)
+
 ## [0.14.0](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.13.2...mcp-v0.14.0) (2026-07-26)
 
 
