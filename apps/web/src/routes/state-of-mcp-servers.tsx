@@ -10,6 +10,7 @@ import {
   classifyTransport,
   hostingOf,
 } from "@/lib/mcp-stats";
+import { reportExportUrl } from "@/lib/data-reports";
 import { absoluteUrl } from "@/lib/seo";
 import { ogImageUrl, OG_WIDTH, OG_HEIGHT } from "@/lib/og-image";
 import { stringifyJsonLd } from "@/lib/json-ld";
@@ -199,6 +200,18 @@ export const Route = createFileRoute("/state-of-mcp-servers")({
         "Source provenance distribution",
         "Install-method distribution",
         "Most common integration tags",
+      ],
+      distribution: [
+        {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: reportExportUrl("mcp-servers", "json"),
+        },
+        {
+          "@type": "DataDownload",
+          encodingFormat: "text/csv",
+          contentUrl: reportExportUrl("mcp-servers", "csv"),
+        },
       ],
     };
     const breadcrumbs = {
