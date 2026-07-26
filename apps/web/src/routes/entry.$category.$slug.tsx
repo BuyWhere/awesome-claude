@@ -243,6 +243,12 @@ export const Route = createFileRoute("/entry/$category/$slug")({
       meta: [
         { title: e.seoTitle ? `${e.seoTitle} — HeyClaude` : ogTitle },
         { name: "description", content: metaDescription },
+        // robotsIndex:false entries are already dropped from the sitemap
+        // (isSitemapIndexableEntry); emit the matching noindex on the detail
+        // page itself so the opt-out also holds for crawlers arriving via
+        // internal links or backlinks — same pattern as the thin-content
+        // guards in tags.$tag.tsx and for.$platform.$category.tsx.
+        ...(e.robotsIndex === false ? [{ name: "robots", content: "noindex, follow" }] : []),
         { property: "og:title", content: ogTitle },
         { property: "og:description", content: metaDescription },
         { property: "og:url", content: url },

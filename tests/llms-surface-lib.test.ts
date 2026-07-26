@@ -6502,3 +6502,44 @@ describe("llms-surface-lib originOf", () => {
     expect(originOf(new Request(url))).toBe("https://host-49.example.com");
   });
 });
+
+describe("llms-surface-lib robotsIndex opt-out (#5471)", () => {
+  // An entry that opts out of indexing with `robotsIndex:false` is dropped from
+  // the sitemap by isSitemapIndexableEntry — the llms surfaces must honor the
+  // same opt-out instead of republishing the entry to AI/agent consumers.
+  const entries = [
+    fixtureEntry("skills", "indexable-skill"),
+    fixtureEntry("skills", "hidden-skill", { robotsIndex: false }),
+    fixtureEntry("skills", "explicitly-indexable-skill", { robotsIndex: true }),
+  ];
+
+  it("buildLlmsTxt omits robotsIndex:false entries and keeps the rest", () => {
+    const output = buildLlmsTxt("https://heyclau.de", {
+      categories: FIXTURE_CATEGORIES,
+      entries,
+    });
+    expect(output).toContain("/entry/skills/indexable-skill");
+    expect(output).toContain("/entry/skills/explicitly-indexable-skill");
+    expect(output).not.toContain("hidden-skill");
+  });
+
+  it("buildLlmsTxt skips a category section when every entry opted out", () => {
+    const output = buildLlmsTxt("https://heyclau.de", {
+      categories: FIXTURE_CATEGORIES,
+      entries: [fixtureEntry("agents", "hidden-agent", { robotsIndex: false })],
+    });
+    expect(output).not.toContain("## Agents");
+    expect(output).not.toContain("hidden-agent");
+  });
+
+  it("buildLlmsFullTxt omits robotsIndex:false entries and keeps the rest", () => {
+    const output = buildLlmsFullTxt("https://heyclau.de", {
+      categories: FIXTURE_CATEGORIES,
+      entries,
+      registryEntries: [],
+    });
+    expect(output).toContain("/entry/skills/indexable-skill");
+    expect(output).toContain("/entry/skills/explicitly-indexable-skill");
+    expect(output).not.toContain("hidden-skill");
+  });
+});
