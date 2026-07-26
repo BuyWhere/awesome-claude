@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.2](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.1...mcp-v0.14.2) (2026-07-26)
+
+
+### Bug Fixes
+
+* **mcp:** reject reserved GitHub owners in bare contact handles ([#5573](https://github.com/JSONbored/awesome-claude/issues/5573)) ([0b316fd](https://github.com/JSONbored/awesome-claude/commit/0b316fdcb6804f764445600f4cf29d7752555db5)), closes [#5562](https://github.com/JSONbored/awesome-claude/issues/5562)
+
 ## [0.14.1](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.0...mcp-v0.14.1) (2026-07-26)
 
 
