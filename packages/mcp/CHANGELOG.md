@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.0](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.13.2...mcp-v0.14.0) (2026-07-26)
+
+
+### Features
+
+* **mcp:** give registry.updates tag/query/trust filters like search/list ([#5564](https://github.com/JSONbored/awesome-claude/issues/5564)) ([ccf5019](https://github.com/JSONbored/awesome-claude/commit/ccf5019aae849cb7d255288a583334e3aa423a78)), closes [#5561](https://github.com/JSONbored/awesome-claude/issues/5561)
+
 ## [0.13.2](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.13.1...mcp-v0.13.2) (2026-07-24)
 
 
