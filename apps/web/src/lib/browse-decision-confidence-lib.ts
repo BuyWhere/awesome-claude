@@ -214,6 +214,9 @@ export function browseDecisionConfidenceState(
     mediumCount: scored.filter((row) => row.band === "medium").length,
     lowCount: scored.filter((row) => row.band === "low").length,
     entries: mapped,
-    lowRefs: mapped.filter((row) => row.band === "low").map((row) => row.entryRef),
+    // Same full-population rule as lowCount (#5551): refs must not be limited
+    // to the display-truncated `mapped` slice or low-band entries sorted below
+    // maxEntries disappear from lowRefs while lowCount still counts them.
+    lowRefs: scored.filter((row) => row.band === "low").map((row) => row.entryRef),
   };
 }
