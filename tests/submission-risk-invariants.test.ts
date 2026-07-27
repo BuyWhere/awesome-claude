@@ -973,3 +973,60 @@ describe("unsafe_install_pipeline command-boundary awareness (#5556)", () => {
     ).not.toContain("unsafe_install_pipeline");
   });
 });
+
+describe("unsafe_install_pipeline base64 via hasBase64DecodedShell (#5591)", () => {
+  function riskFlagIds(installCommand: string) {
+    const draft = buildSubmissionPrDraft({
+      ...validMcpFields,
+      name: "Base64 Pipeline MCP",
+      slug: "base64-pipeline-mcp",
+      install_command: installCommand,
+      safety_notes: "Runs a local MCP server process with user-selected tools.",
+      privacy_notes: "Only handles context selected by the user.",
+    });
+    const validation = validateSubmission(draft);
+    return analyzeSubmissionDraftRisk(draft, validation).reviewFlags.map(
+      (flag) => flag.id,
+    );
+  }
+
+  it("still flags the classic base64 -d | bash form", () => {
+    expect(riskFlagIds("echo cGF5 | base64 -d | bash")).toContain(
+      "unsafe_install_pipeline",
+    );
+  });
+
+  it("still flags base64 --decode | sh", () => {
+    expect(riskFlagIds("echo cGF5 | base64 --decode | sh")).toContain(
+      "unsafe_install_pipeline",
+    );
+  });
+
+  // The stale `\bbase64\s+(-d|--decode)\b` regex required a word boundary
+  // immediately after `-d`, so bundled short flags like `-di` never matched.
+  it("flags bundled decode+ignore-garbage: base64 -di | bash", () => {
+    expect(riskFlagIds("echo cGF5 | base64 -di | bash")).toContain(
+      "unsafe_install_pipeline",
+    );
+  });
+
+  // Pipe-chain barriers + sudo prefix are handled by hasBase64DecodedShell;
+  // the old bounded-window regex had no notion of either.
+  it("flags base64 -d | sudo -E bash", () => {
+    expect(riskFlagIds("echo cGF5 | base64 -d | sudo -E bash")).toContain(
+      "unsafe_install_pipeline",
+    );
+  });
+
+  it("flags base64 -d | cat | bash pipe-chain passthrough", () => {
+    expect(riskFlagIds("echo cGF5 | base64 -d | cat | bash")).toContain(
+      "unsafe_install_pipeline",
+    );
+  });
+
+  it("does not flag base64 decode piped to a non-shell consumer", () => {
+    expect(riskFlagIds("echo cGF5 | base64 -d | jq .")).not.toContain(
+      "unsafe_install_pipeline",
+    );
+  });
+});
