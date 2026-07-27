@@ -365,6 +365,71 @@ describe("submission risk invariants", () => {
     ).not.toContain("missing_safety_notes");
   });
 
+  it("applies defensive safe harbor to malware_or_abuse_surface (#5584)", () => {
+    // Safe-harbor condition: hasDefensiveSecuritySafeHarbor(text) after the
+    // action→threat mitigation pattern matches defensive verbs near
+    // malware/abuse vocabulary (and no theft/abuse-enablement overrides).
+    // True-negative: defensive anti-malware tool — must NOT flag.
+    const defensive = analyzeDirectContentRisk({
+      pullRequest: {
+        number: 5584,
+        title: "content(mcp): add malware scanner mcp",
+        user: { login: "contributor" },
+        head: { repo: { full_name: "contributor/awesome-claude" } },
+        base: { repo: { full_name: "JSONbored/awesome-claude" } },
+      },
+      files: [
+        sourceFile(
+          validMcpMdx({
+            title: "Malware Scanner MCP",
+            slug: "malware-scanner-mcp",
+            description:
+              "Malware Scanner — detects and removes ransomware, trojans, and keyloggers from downloaded files.",
+            repoUrl: "https://github.com/example/malware-scanner-mcp",
+            docsUrl: "https://example.com/malware-scanner-mcp",
+            safetyNotes: [
+              "Scans local downloads offline; does not execute sample payloads.",
+            ],
+            privacyNotes: ["Only handles user-selected downloaded files."],
+          }),
+          "content/mcp/malware-scanner-mcp.mdx",
+        ),
+      ],
+    });
+    // True-positive: offensive malware/abuse capability — must still flag.
+    const offensive = analyzeDirectContentRisk({
+      pullRequest: {
+        number: 5585,
+        title: "content(mcp): add botnet operator mcp",
+        user: { login: "contributor" },
+        head: { repo: { full_name: "contributor/awesome-claude" } },
+        base: { repo: { full_name: "JSONbored/awesome-claude" } },
+      },
+      files: [
+        sourceFile(
+          validMcpMdx({
+            title: "Botnet Operator MCP",
+            slug: "botnet-operator-mcp",
+            description:
+              "Operator MCP that deploys ransomware and trojan backdoors for botnet malware campaigns.",
+            repoUrl: "https://github.com/example/botnet-operator-mcp",
+            docsUrl: "https://example.com/botnet-operator-mcp",
+            safetyNotes: ["Runs remote payloads on target hosts."],
+            privacyNotes: ["Collects host identifiers from infected machines."],
+          }),
+          "content/mcp/botnet-operator-mcp.mdx",
+        ),
+      ],
+    });
+
+    expect(defensive.reviewFlags.map((flag) => flag.id)).not.toContain(
+      "malware_or_abuse_surface",
+    );
+    expect(offensive.reviewFlags.map((flag) => flag.id)).toContain(
+      "malware_or_abuse_surface",
+    );
+  });
+
   it("keeps identity attestation risk matching narrow and synchronized with CI", () => {
     const sensitiveReport = analyzeDirectContentRisk({
       pullRequest: {
