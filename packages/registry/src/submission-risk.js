@@ -90,8 +90,17 @@ const IDENTITY_ATTESTATION_REVERSE_PATTERN = new RegExp(
   `\\b(?:${SENSITIVE_ATTESTATION_REVERSE_TERMS})s?\\b[\\s\\S]{0,120}\\battestations?\\b`,
   "i",
 );
+// Also covers malware/abuse-tooling vocabulary on the action→threat direction
+// (#5584) so defensive anti-malware phrasing ("detects ransomware", "removes
+// keyloggers") gets the same safe harbor as credential-theft mitigation.
+// Malware terms are intentionally NOT added to the reverse (threat→action)
+// alternative: titles like "Ransomware …" plus a later "review" token in a
+// docs URL would false-harbor. Verb forms include optional trailing `s`
+// (`detects?`/`blocks?`/`removes?`) to match natural defensive prose.
 const DEFENSIVE_SECURITY_MITIGATION_PATTERN =
-  /\b(prevent|protect|warn(?:s|ing)? before|block|detect|detection|redact|sanitize|audit|review|remediate|remediation|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b[\s\S]{0,160}\b(?:(?:credential|password|cookie|session|token|wallet|secret|leak)s?|expos(?:e|ing|ure))\b|\b(?:credential|password|cookie|session|token|wallet|secret)s?\b[\s\S]{0,160}\b(prevent|protect|warn(?:s|ing)? before|block|detect|detection|redact|sanitize|audit|review|remediate|remediation|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b/i;
+  /\b(prevent|protect|warn(?:s|ing)? before|blocks?|detects?|detection|redact|sanitize|audit|review|remediate|remediation|removes?|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b[\s\S]{0,160}\b(?:(?:credential|password|cookie|session|token|wallet|secret|leak)s?|expos(?:e|ing|ure)|ransomware|trojans?|keyloggers?|backdoors?|botnets?|worms?|cryptojackers?|malware)\b|\b(?:credential|password|cookie|session|token|wallet|secret)s?\b[\s\S]{0,160}\b(prevent|protect|warn(?:s|ing)? before|blocks?|detects?|detection|redact|sanitize|audit|review|remediate|remediation|removes?|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b/i;
+const MALWARE_OR_ABUSE_SURFACE_PATTERN =
+  /\b(ransomware|trojan|keylogger|credential stealer|password stealer|cookie stealer|backdoor|botnet|worm|cryptojacker|malware)\b/i;
 const RESOURCE_THEFT_CAPABILITY_PATTERN =
   /\b(?:this|the|our)?\s*(?:agent|command|hook|mcp|server|skill|statusline|tool|workflow)\b[\s\S]{0,40}\b(?:can|will|does|advertises?|offers?|enables?|designed to|built to)\b[\s\S]{0,80}\b(steals?|exfiltrates?|harvests?|dumps?)\b[\s\S]{0,80}\b(credential|password|cookie|session|token|wallet)s?\b|\b(steals?|exfiltrates?|harvests?|dumps?)\b[\s\S]{0,80}\b(credential|password|cookie|session|token|wallet)s?\b[\s\S]{0,80}\b(?:with|using|through|by)\b[\s\S]{0,40}\b(?:agent|command|hook|mcp|server|skill|statusline|tool|workflow)\b/i;
 // Adult "xxx" only in an explicit adult context, so legitimate developer idioms
@@ -1299,10 +1308,12 @@ function addContentRiskSignals(report, fields, text) {
     );
   }
 
+  // Same defensive safe-harbor gate as malicious_data_theft_capability (#5584):
+  // anti-malware/security tools that mitigate ransomware/trojans/keyloggers must
+  // not be treated as malware/abuse surface themselves.
   if (
-    /\b(ransomware|trojan|keylogger|credential stealer|password stealer|cookie stealer|backdoor|botnet|worm|cryptojacker|malware)\b/i.test(
-      text,
-    )
+    !hasDefensiveSecuritySafeHarbor(text) &&
+    MALWARE_OR_ABUSE_SURFACE_PATTERN.test(text)
   ) {
     addFlag(
       report,

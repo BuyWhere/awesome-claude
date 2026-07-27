@@ -73,8 +73,12 @@ const IDENTITY_ATTESTATION_REVERSE_PATTERN = new RegExp(
   `\\b(?:${SENSITIVE_ATTESTATION_REVERSE_TERMS})s?\\b[\\s\\S]{0,${SENSITIVE_ATTESTATION_WINDOW}}\\battestations?\\b`,
   "i",
 );
+// Keep in sync with packages/registry/src/submission-risk.js (#5584): malware
+// terms only on the action→threat alternative; optional trailing `s` on
+// detect/block/remove. Do not put malware terms on the reverse alternative
+// (avoids title+docs-URL "review" false harbors).
 const DEFENSIVE_SECURITY_MITIGATION_PATTERN =
-  /\b(prevent|protect|warn(?:s|ing)? before|block|detect|detection|redact|sanitize|audit|review|remediate|remediation|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b[\s\S]{0,160}\b(?:(?:credential|password|cookie|session|token|wallet|secret|leak)s?|expos(?:e|ing|ure))\b|\b(?:credential|password|cookie|session|token|wallet|secret)s?\b[\s\S]{0,160}\b(prevent|protect|warn(?:s|ing)? before|block|detect|detection|redact|sanitize|audit|review|remediate|remediation|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b/i;
+  /\b(prevent|protect|warn(?:s|ing)? before|blocks?|detects?|detection|redact|sanitize|audit|review|remediate|remediation|removes?|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b[\s\S]{0,160}\b(?:(?:credential|password|cookie|session|token|wallet|secret|leak)s?|expos(?:e|ing|ure)|ransomware|trojans?|keyloggers?|backdoors?|botnets?|worms?|cryptojackers?|malware)\b|\b(?:credential|password|cookie|session|token|wallet|secret)s?\b[\s\S]{0,160}\b(prevent|protect|warn(?:s|ing)? before|blocks?|detects?|detection|redact|sanitize|audit|review|remediate|remediation|removes?|hardening|least privilege|safe configuration|avoid (?:pasting|exposing|leaking)|leak warning)\b/i;
 const RESOURCE_THEFT_CAPABILITY_PATTERN =
   /\b(?:this|the|our)?\s*(?:agent|command|hook|mcp|server|skill|statusline|tool|workflow)\b[\s\S]{0,40}\b(?:can|will|does|advertises?|offers?|enables?|designed to|built to)\b[\s\S]{0,80}\b(steals?|exfiltrates?|harvests?|dumps?)\b[\s\S]{0,80}\b(credential|password|cookie|session|token|wallet)s?\b|\b(steals?|exfiltrates?|harvests?|dumps?)\b[\s\S]{0,80}\b(credential|password|cookie|session|token|wallet)s?\b[\s\S]{0,80}\b(?:with|using|through|by)\b[\s\S]{0,40}\b(?:agent|command|hook|mcp|server|skill|statusline|tool|workflow)\b/i;
 const CREDENTIAL_THEFT_PATTERN =
