@@ -182,11 +182,27 @@ export function isEnvironmentAssignment(token) {
 // Resolve a pipe segment's lead command, stepping over POSIX environment
 // assignments and optional `sudo`/`env` prefixes (so `HTTPS_PROXY=x curl`,
 // `sudo -E bash`, and `env VAR=x curl` read as the command they execute).
+// Prefix stripping loops until stable so `env VAR=x sudo <cmd>` is handled the
+// same as `sudo env VAR=x <cmd>` (#5585). Leading `(`/`{`/whitespace are also
+// skipped so a subshell/group wrap like `(rm -rf /)` still resolves to `rm`
+// instead of an empty command word (#5585).
 // Returns the lowercased command word plus `argStart`, the index where the
 // command's own argument tokens begin — so callers can walk `rm`/`chmod` flags
 // token-by-token instead of pattern-matching one bundled-flag spelling.
 export function resolveSegmentCommand(line, lowerLine, start, end) {
   let index = start;
+
+  const skipGroupingOpeners = () => {
+    while (
+      index < end &&
+      (/\s/.test(line[index] || "") ||
+        line[index] === "(" ||
+        line[index] === "{")
+    ) {
+      index += 1;
+    }
+  };
+
   const skipAssignments = () => {
     for (;;) {
       const token = shellToken(line, lowerLine, index, end);
@@ -195,9 +211,9 @@ export function resolveSegmentCommand(line, lowerLine, start, end) {
     }
   };
 
-  skipAssignments();
-  const first = shellToken(line, lowerLine, index, end);
-  if (first?.lower === "sudo") {
+  const skipSudoPrefix = () => {
+    const first = shellToken(line, lowerLine, index, end);
+    if (first?.lower !== "sudo") return false;
     index = first.end;
     for (;;) {
       const flag = shellToken(line, lowerLine, index, end);
@@ -211,11 +227,12 @@ export function resolveSegmentCommand(line, lowerLine, start, end) {
         if (value) index = value.end;
       }
     }
-    skipAssignments();
-  }
+    return true;
+  };
 
-  const maybeEnv = shellToken(line, lowerLine, index, end);
-  if (maybeEnv?.lower === "env") {
+  const skipEnvPrefix = () => {
+    const maybeEnv = shellToken(line, lowerLine, index, end);
+    if (maybeEnv?.lower !== "env") return false;
     index = maybeEnv.end;
     for (;;) {
       const token = shellToken(line, lowerLine, index, end);
@@ -232,7 +249,20 @@ export function resolveSegmentCommand(line, lowerLine, start, end) {
         break;
       }
     }
+    return true;
+  };
+
+  // Re-check after each strip so `env … sudo …` and `(sudo …)` both resolve to
+  // the real command rather than stopping at a fixed sudo-then-env order.
+  for (;;) {
+    skipGroupingOpeners();
+    skipAssignments();
+    if (skipSudoPrefix()) continue;
+    if (skipEnvPrefix()) continue;
+    break;
   }
+  skipGroupingOpeners();
+  skipAssignments();
 
   const command = shellToken(line, lowerLine, index, end);
   if (!command) return { command: "", argStart: index };
