@@ -262,4 +262,21 @@ describe("summary population", () => {
       state.scannedCount,
     );
   });
+
+  it("includes lowRefs for low-band entries that fall outside the display slice (#5551)", () => {
+    // 8 strong rows fill maxEntries (default 8); all 12 weak rows sort below
+    // the visible cutoff. Before: lowRefs=[]. After: lowRefs lists every weak
+    // entry, matching lowCount.
+    const state = browseDecisionConfidenceState(population(8, 12), "balanced");
+    const expectedLowRefs = Array.from(
+      { length: 12 },
+      (_, index) => `tools/weak-${index}`,
+    );
+
+    expect(state.entries).toHaveLength(8);
+    expect(state.entries.every((row) => row.band !== "low")).toBe(true);
+    expect(state.lowCount).toBe(12);
+    expect(state.lowRefs).toHaveLength(12);
+    expect([...state.lowRefs].sort()).toEqual([...expectedLowRefs].sort());
+  });
 });
