@@ -626,6 +626,13 @@ describe("token-aware rm/chmod flag detection", () => {
     ["rm -rfv /", true], // bundled with extra verbose flag
     ["sudo rm -Rf /", true], // uppercase -R via sudo prefix
     ["env FOO=1 rm -r -f /", true], // env prefix + split flags
+    // #5585: paren/brace wrap used to resolve the lead command to "" and evade
+    // every detector that depends on resolveSegmentCommand.
+    ["(rm -rf /)", true],
+    ["{rm -rf /}", true],
+    // #5585: sudo after env was missed because stripping was a fixed
+    // sudo-then-env order rather than a loop.
+    ["env FOO=bar sudo rm -rf /", true],
     ["rm -r /tmp", false], // recursive only, no force — not flagged
     ["rm --force /tmp", false], // force only, no recursive
     ["rm file.txt", false], // benign remove
@@ -684,6 +691,46 @@ describe("token-aware rm/chmod flag detection", () => {
     expect(
       segmentLeadCommand(line, lower(line), segment.start, segment.end),
     ).toBe("rm");
+  });
+});
+
+describe("resolveSegmentCommand grouping + prefix loop (#5585)", () => {
+  function resolvedCommand(line: string) {
+    const [segment] = pipeChainSegments(line);
+    return resolveSegmentCommand(line, lower(line), segment.start, segment.end)
+      .command;
+  }
+
+  it("resolves paren-wrapped rm to the real command word", () => {
+    expect(resolvedCommand("(rm -rf /)")).toBe("rm");
+    expect(hasRecursiveForceRemove("(rm -rf /)", lower("(rm -rf /)"))).toBe(
+      true,
+    );
+  });
+
+  it("resolves brace-wrapped and spaced subshell forms", () => {
+    expect(resolvedCommand("{rm -rf /}")).toBe("rm");
+    expect(resolvedCommand("( rm -rf / )")).toBe("rm");
+    expect(resolvedCommand("((rm -rf /))")).toBe("rm");
+  });
+
+  it("strips sudo that appears after an env prefix", () => {
+    const line = "env FOO=bar sudo rm -rf /";
+    expect(resolvedCommand(line)).toBe("rm");
+    expect(hasRecursiveForceRemove(line, lower(line))).toBe(true);
+  });
+
+  it("still strips the classic sudo-then-env order", () => {
+    const line = "sudo env FOO=bar rm -rf /";
+    expect(resolvedCommand(line)).toBe("rm");
+    expect(hasRecursiveForceRemove(line, lower(line))).toBe(true);
+  });
+
+  it("strips sudo inside a paren wrap", () => {
+    expect(resolvedCommand("(sudo rm -rf /)")).toBe("rm");
+    expect(
+      hasRecursiveForceRemove("(sudo rm -rf /)", lower("(sudo rm -rf /)")),
+    ).toBe(true);
   });
 });
 
