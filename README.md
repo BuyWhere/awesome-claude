@@ -12,7 +12,7 @@
         templates, and statuslines.
       </p>
       <p>
-        <strong>1385+ file-backed entries</strong> stay useful as both an
+        <strong>1386+ file-backed entries</strong> stay useful as both an
         awesome-list catalog and a machine-readable registry for builders.
       </p>
       <p>
@@ -36,7 +36,7 @@
       <h3>Registry snapshot</h3>
       <table>
         <tr>
-          <td align="center"><strong>1385</strong><br><sub>entries</sub></td>
+          <td align="center"><strong>1386</strong><br><sub>entries</sub></td>
           <td align="center"><strong>10</strong><br><sub>sections</sub></td>
           <td align="center"><strong>AI-reviewed</strong><br><sub>merge gate</sub></td>
         </tr>
@@ -89,7 +89,7 @@ Refreshed weekly by [`.github/workflows/gittensor-impact.yml`](.github/workflows
         </td>
 <td align="center" width="20%">
           <a href="#skills"><strong>🧠 Skills</strong></a><br>
-          <code>177</code><br>
+          <code>178</code><br>
           <sub>Source-backed skill packs and reusable capabilities.</sub>
         </td>
 <td align="center" width="20%">
@@ -1002,7 +1002,7 @@ Get a free API key on https://app.zyntra.app/
 - **[Zapier AI](https://heyclau.de/entry/tools/zapier-ai)** - Automation platform with AI-assisted workflows, app integrations, agents, actions, and business process automation.
 - **[Zed](https://heyclau.de/entry/tools/zed)** - Collaborative code editor with AI assistance, fast native performance, and developer-focused collaboration workflows.
 
-## 🧠 Skills (177)
+## 🧠 Skills (178)
 
 - **[Addy Osmani Agent Skills](https://heyclau.de/entry/skills/addy-osmani-agent-skills)** - Addy Osmani's production-grade Agent Skills pack for AI coding agents, with lifecycle slash commands, engineering workflow skills, review personas, quality gates, and cross-agent setup guidance for Claude Code, Cursor, Gemini CLI, Antigravity CLI, OpenCode, GitHub Copilot, and other agents.
 - **[Agent Evals Regression Gate Skill](https://heyclau.de/entry/skills/agent-evals-regression-gate)** - Build repeatable eval suites that catch quality regressions in AI agent behavior before merge or release.
@@ -1132,6 +1132,7 @@ Get a free API key on https://app.zyntra.app/
 - **[PageSpeed Insights Optimization Skill for AI Agents](https://heyclau.de/entry/skills/pagespeed-insights-optimizer)** - Structured optimization workflow for PageSpeed Insights and Lighthouse that improves Core Web Vitals without changing UI/UX.
 - **[Payload Next.js CMS Backend Skill](https://heyclau.de/entry/skills/payload-nextjs-cms-backend)** - Add Payload to a Next.js app with code-first collections, admin UI, database adapters, access control, Local API usage, uploads, migrations, and production CMS safety review.
 - **[Planning with Files](https://heyclau.de/entry/skills/planning-with-files)** - MIT-licensed Agent Skill for persistent file-based planning across Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Hermes Agent, OpenClaw, Kiro, and other SKILL.md-compatible coding agents, with task_plan.md, findings.md, progress.md, hooks, session recovery, attestation, and opt-in long-running run modes.
+- **[Plasma Wiki](https://heyclau.de/entry/skills/plasma-wiki)** - Keep project knowledge in plain Markdown while a deterministic CLI maintains folder indexes, cross-links, structure checks, and scoped map, search, and read commands for agents.
 - **[Playwright E2E Testing Automation Skill](https://heyclau.de/entry/skills/playwright-e2e-testing)** - Write and maintain reliable end-to-end tests with Playwright — Microsoft's browser automation library that auto-waits for actionable elements and runs the same suite against Chromium, Firefox, and WebKit.
 - **[Playwright MCP Browser Automation Engineer Skill](https://heyclau.de/entry/skills/playwright-mcp-browser-automation-engineer)** - Build resilient browser automations using Playwright MCP with robust selectors, retries, and deterministic task execution.
 - **[Playwright Trace Failure Triage Capability Pack Skill](https://heyclau.de/entry/skills/playwright-trace-failure-triage-capability-pack)** - Expert skill for reviewing Playwright trace artifacts, screenshots, action timelines, network events, retries, and CI evidence to classify flaky browser test failures without guessing from logs alone.
