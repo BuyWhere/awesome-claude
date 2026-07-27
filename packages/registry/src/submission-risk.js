@@ -5,7 +5,10 @@ import {
   TOOLS_LISTING_FLOW_URL,
 } from "./submission-classification.js";
 import { parseSafeFrontmatter } from "./frontmatter.js";
-import { hasPipeToShellInstall } from "./command-safety-lib.js";
+import {
+  hasBase64DecodedShell,
+  hasPipeToShellInstall,
+} from "./command-safety-lib.js";
 import {
   AFFILIATE_PARAMS,
   isPublicGitHubProfileUrl,
@@ -16,6 +19,9 @@ import {
 
 // Curl/wget → shell detection is command-boundary-aware via hasPipeToShellInstall
 // (#5556). The previous bounded-window regex false-positived across `;`/`&&`.
+// Base64 → shell uses hasBase64DecodedShell for the same reason (#5591): the old
+// `\bbase64\s+(-d|--decode)\b` regex missed bundled flags (`-di`), `sudo`, and
+// pipe-chain passthroughs that the shared helper already handles.
 
 // Anthropic (`sk-ant-…`) and OpenAI (`sk-proj-…`) insert a hyphenated segment after
 // `sk-`, which the old `sk-[a-z0-9]{20,}` alternative could never match (#5479).
@@ -1178,6 +1184,22 @@ function hasUnsafeCurlWgetPipeToShell(installText) {
   return false;
 }
 
+// True when a base64-decode segment feeds a shell later in the same pipe chain.
+// Mirrors hasUnsafeCurlWgetPipeToShell: line-by-line + double-quoted interiors,
+// so config/JSON embeds keep flagging while bundled flags (`-di`), `sudo`, and
+// passthrough commands are handled by hasBase64DecodedShell (#5591).
+function hasUnsafeBase64DecodedShell(installText) {
+  for (const line of String(installText ?? "").split(/\r?\n/)) {
+    if (!line) continue;
+    if (hasBase64DecodedShell(line, line)) return true;
+    for (const match of line.matchAll(/"([^"]*)"/g)) {
+      const inner = match[1];
+      if (inner && hasBase64DecodedShell(inner, inner)) return true;
+    }
+  }
+  return false;
+}
+
 function addContentRiskSignals(report, fields, text) {
   const installText = lower(
     [
@@ -1283,9 +1305,7 @@ function addContentRiskSignals(report, fields, text) {
     referencesDestructiveRootRemoval(installText) ||
     hasUnsafeCurlWgetPipeToShell(installText) ||
     /\b(invoke-expression|iex)\b/i.test(installText) ||
-    /\bbase64\s+(-d|--decode)\b[\s\S]{0,80}\|[\s\S]{0,40}\b(sh|bash)\b/i.test(
-      installText,
-    ) ||
+    hasUnsafeBase64DecodedShell(installText) ||
     /\bpowershell\b[\s\S]{0,80}\b-encodedcommand\b/i.test(installText)
   ) {
     addFlag(
