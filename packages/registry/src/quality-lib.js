@@ -44,13 +44,25 @@ export function normalizeBodyForDuplicateCheck(entry) {
     .trim();
 }
 
+/**
+ * Canonical source-URL fields — keep in sync with
+ * `ENTRY_SOURCE_URL_FIELDS` in `packages/mcp/src/search-ranking-lib.js` so
+ * content-quality / source-health reports agree with MCP trust summaries.
+ */
+export const SOURCE_PROVENANCE_URL_FIELDS = Object.freeze([
+  "documentationUrl",
+  "docsUrl",
+  "repoUrl",
+  "githubUrl",
+  "sourceUrl",
+  "url",
+  "canonicalUrl",
+  "llmsUrl",
+  "apiUrl",
+]);
+
 export function buildSourceProvenance(entry) {
-  const sourceUrls = [
-    entry.documentationUrl,
-    entry.repoUrl,
-    entry.githubUrl,
-    entry.websiteUrl,
-  ]
+  const sourceUrls = SOURCE_PROVENANCE_URL_FIELDS.map((field) => entry[field])
     .map(clean)
     .filter(Boolean);
   const externalSourceUrls = sourceUrls.filter(
