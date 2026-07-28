@@ -506,6 +506,18 @@ describe("registry-trust-lib sourceSummary", () => {
     ).toBe("https://github.com/fb/r");
   });
 
+  it("ignores self-referential githubUrl when falling back for repoUrl", () => {
+    expect(
+      sourceSummary(
+        makeEntry({
+          repoUrl: "",
+          githubUrl:
+            "https://github.com/JSONbored/awesome-claude/blob/main/content/mcp/x.mdx",
+        }),
+      ).repoUrl,
+    ).toBe("");
+  });
+
   it("treats non-numeric github stats as null", () => {
     expect(
       sourceSummary(makeEntry({ githubStars: "many", githubForks: undefined }))
@@ -862,6 +874,20 @@ describe("registry-trust-lib entryTrustRecommendations", () => {
         repoUrl: "",
         documentationUrl: "",
         githubUrl: "",
+      }),
+    );
+    expect(recs).toContain(
+      "Verify a canonical source before relying on this entry.",
+    );
+  });
+
+  it("recommends verifying source when only self-referential githubUrl is present", () => {
+    const recs = entryTrustRecommendations(
+      makeEntry({
+        repoUrl: "",
+        documentationUrl: "",
+        githubUrl:
+          "https://github.com/JSONbored/awesome-claude/blob/main/content/mcp/x.mdx",
       }),
     );
     expect(recs).toContain(

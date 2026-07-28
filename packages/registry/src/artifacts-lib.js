@@ -488,7 +488,8 @@ function sourceUrlsForEntry(entry) {
     entry.docsUrl,
     entry.downloadUrl,
     entry.repoUrl,
-    entry.githubUrl,
+    // Self-referential directory githubUrl is not external provenance.
+    externalGithubUrl(entry),
     entry.packageUrl,
     entry.repositoryUrl,
     entry.sourceUrl,

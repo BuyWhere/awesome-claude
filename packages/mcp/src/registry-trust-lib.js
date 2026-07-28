@@ -35,6 +35,16 @@ export function sourceHost(value) {
   return publicUrlHostname(String(value || "").trim());
 }
 
+// Match artifacts-lib `externalGithubUrl`: the directory always stamps a
+// self-referential github.com/JSONbored/awesome-claude link that is not a
+// real external source for trust / "verify canonical source" recommendations.
+function externalGithubUrl(entry) {
+  return entry.githubUrl &&
+    !String(entry.githubUrl).includes("github.com/JSONbored/awesome-claude")
+    ? entry.githubUrl
+    : "";
+}
+
 export function entrySourceHosts(entry) {
   // Hosts must come from the same URL field list as `source.status`
   // (`entrySourceUrls` / `ENTRY_SOURCE_URL_FIELDS`) so the two signals cannot
@@ -44,7 +54,7 @@ export function entrySourceHosts(entry) {
 
 export function sourceSummary(entry) {
   return {
-    repoUrl: entry.repoUrl || entry.githubUrl || "",
+    repoUrl: entry.repoUrl || externalGithubUrl(entry) || "",
     documentationUrl: entry.documentationUrl || "",
     downloadUrl: entry.downloadUrl || "",
     sourceHosts: unique(entrySourceHosts(entry)),
