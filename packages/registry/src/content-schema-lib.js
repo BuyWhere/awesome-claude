@@ -816,7 +816,8 @@ export function validateEntry(category, data, inferred = {}) {
   for (const field of [
     "authorProfileUrl",
     "repoUrl",
-    "documentationUrl",
+    // skills: https-only below — matches retrievalSources auto-derived from it
+    ...(category === "skills" ? [] : ["documentationUrl"]),
     "sourceUrl",
     "docsUrl",
     "packageUrl",
@@ -826,6 +827,10 @@ export function validateEntry(category, data, inferred = {}) {
     if (!isPublicHttpUrl(merged[field])) {
       semanticErrors.push(`${field} must use http or https`);
     }
+  }
+
+  if (category === "skills" && !isPublicHttpsUrl(merged.documentationUrl)) {
+    semanticErrors.push("documentationUrl must use https");
   }
 
   if (Array.isArray(merged.sourceUrls)) {
