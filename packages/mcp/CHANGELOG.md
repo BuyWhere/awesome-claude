@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.4](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.3...mcp-v0.14.4) (2026-07-28)
+
+
+### Bug Fixes
+
+* **mcp:** bound entry list size in compareEntries and reviewEntrySafety ([#5626](https://github.com/JSONbored/awesome-claude/issues/5626)) ([1387832](https://github.com/JSONbored/awesome-claude/commit/1387832407031c62fa80a5cd3d34fec2d037d2e9)), closes [#5583](https://github.com/JSONbored/awesome-claude/issues/5583)
+
 ## [0.14.3](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.2...mcp-v0.14.3) (2026-07-28)
 
 
