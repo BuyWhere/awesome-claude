@@ -18,6 +18,7 @@ import { buildEntryCitationFacts } from "@heyclaude/registry/llms";
 
 import { loadContentEntries, repoRoot } from "./helpers/registry-fixtures";
 import { ENTRIES } from "../apps/web/src/data/entries";
+import { COMMERCIAL_TOOLS } from "../apps/web/src/data/tools";
 
 describe("SEO JSON-LD policy", () => {
   const entries = loadContentEntries();
@@ -465,6 +466,56 @@ describe("entry page JSON-LD unification (#3926)", () => {
       ]) {
         expect(json, `${category} must omit ${banned}`).not.toContain(banned);
       }
+    }
+  });
+});
+
+describe("index route ItemList completeness (#5593)", () => {
+  const routeSource = (file: string) =>
+    fs.readFileSync(path.join(repoRoot, "apps/web/src/routes", file), "utf8");
+
+  it("builds the /tools ItemList from every rendered tool", () => {
+    const source = routeSource("tools.tsx");
+    // Drift guard: the JSON-LD must not re-introduce a cap that the visible
+    // grid does not apply. The grid maps COMMERCIAL_TOOLS directly.
+    expect(source).toContain("itemListScript(");
+    expect(source).not.toMatch(/COMMERCIAL_TOOLS\s*\.\s*slice\s*\(/);
+
+    // The emitted schema covers the whole array, so numberOfItems matches the
+    // number of cards the page renders rather than a truncated prefix.
+    const itemList = buildItemListJsonLd(
+      COMMERCIAL_TOOLS.map((tool) => ({
+        name: tool.name,
+        url: `https://heyclau.de/entry/tools/${tool.slug}`,
+      })),
+      { name: "Claude tools" },
+    );
+    expect(itemList.numberOfItems).toBe(COMMERCIAL_TOOLS.length);
+    expect(itemList.itemListElement).toHaveLength(COMMERCIAL_TOOLS.length);
+    // Guards the specific regression: the old cap stopped at 30.
+    expect(COMMERCIAL_TOOLS.length).toBeGreaterThan(30);
+    expect(itemList.itemListElement.at(-1)?.position).toBe(
+      COMMERCIAL_TOOLS.length,
+    );
+  });
+
+  it("passes the whole collection into itemListScript on sibling index routes", () => {
+    // /tools was the only index route truncating its ItemList. Assert on the
+    // itemListScript argument itself rather than the whole file — several of
+    // these routes legitimately slice elsewhere for UI previews.
+    const cases: Array<[string, string]> = [
+      ["best.index.tsx", "BEST_LISTS"],
+      ["compare.index.tsx", "COMPARISONS"],
+      ["contributors.index.tsx", "CONTRIBUTORS"],
+      ["integrations.index.tsx", "INTEGRATIONS"],
+    ];
+    for (const [file, collection] of cases) {
+      const source = routeSource(file);
+      expect(source, file).toContain("itemListScript(");
+      expect(source, file).toContain(`${collection}.map(`);
+      expect(source, file).not.toMatch(
+        new RegExp(`${collection}\\s*\\.\\s*slice\\s*\\(`),
+      );
     }
   });
 });

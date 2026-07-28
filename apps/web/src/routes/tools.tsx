@@ -60,7 +60,10 @@ export const Route = createFileRoute("/tools")({
         { name: "Tools", path: "/tools" },
       ]),
       itemListScript(
-        COMMERCIAL_TOOLS.slice(0, 30).map((t) => ({
+        // Every tool the grid below renders, matching the other index routes
+        // that pass their full array. A truncated ItemList advertised fewer
+        // items to crawlers than the page actually shows (#5593).
+        COMMERCIAL_TOOLS.map((t) => ({
           name: t.name,
           path: `/entry/tools/${t.slug}`,
         })),
