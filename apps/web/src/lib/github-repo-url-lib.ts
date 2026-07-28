@@ -9,7 +9,7 @@
 export function parseRepo(url: string): { owner: string; repo: string } | null {
   try {
     const parsed = new URL(url);
-    if (parsed.hostname !== "github.com") return null;
+    if (parsed.hostname.replace(/^www\./, "") !== "github.com") return null;
     const [owner, repo] = parsed.pathname.split("/").filter(Boolean);
     if (!owner || !repo) return null;
     return { owner, repo: repo.replace(/\.git$/, "") };

@@ -10,6 +10,13 @@ describe("parseRepo", () => {
     });
   });
 
+  it("parses owner/repo from a www.github.com URL", () => {
+    expect(parseRepo("https://www.github.com/acme/widgets")).toEqual({
+      owner: "acme",
+      repo: "widgets",
+    });
+  });
+
   it("strips a trailing .git and extra path segments", () => {
     expect(parseRepo("https://github.com/acme/widgets.git")).toEqual({
       owner: "acme",
