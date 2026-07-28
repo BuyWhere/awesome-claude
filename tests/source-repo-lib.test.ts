@@ -477,6 +477,29 @@ describe("parseGitHubRepoUrl enterprise and typo rejection", () => {
     expect(parseGitHubRepoUrl(input)).toBeNull();
   });
 
+  // Regression (#5588): the embedded-userinfo guard only runs for http:/https:,
+  // so before the protocol allowlist any other scheme carried credentials
+  // straight through to a successful parse.
+  it.each([
+    "ftp://user:pass@github.com/OpenAI/whisper",
+    "ftp://github.com/OpenAI/whisper",
+    "file://github.com/OpenAI/whisper",
+    "data://user:pass@github.com/OpenAI/whisper",
+    "ws://token@github.com/OpenAI/whisper",
+  ])("rejects URLs using a non-allowlisted scheme: %s", (input) => {
+    expect(parseGitHubRepoUrl(input)).toBeNull();
+  });
+
+  it.each([
+    "https://github.com/OpenAI/whisper",
+    "http://github.com/OpenAI/whisper",
+    "git://github.com/OpenAI/whisper.git",
+    "ssh://git@github.com/OpenAI/whisper.git",
+    "git+https://github.com/OpenAI/whisper.git",
+  ])("keeps allowlisted schemes parsing: %s", (input) => {
+    expect(parseGitHubRepoUrl(input)).toEqual(whisper);
+  });
+
   it.each([
     "github.com/OpenAI/whisper",
     "www.github.com/OpenAI/whisper",
