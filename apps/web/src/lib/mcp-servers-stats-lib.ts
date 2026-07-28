@@ -31,9 +31,7 @@ export function buildMcpServersReport(entries: ReadonlyArray<Entry>, asOf: strin
   const local = mcp.filter(
     (entry) => hostingOf(classifyTransport(entry)) === "Local (stdio)",
   ).length;
-  const sourceBacked = mcp.filter(
-    (entry) => entry.source === "source-backed" || entry.source === "first-party",
-  ).length;
+  const sourceBacked = mcp.filter((entry) => entry.source !== "unverified").length;
 
   const trustRows = TRUST_ORDER.map((trust) => {
     const count = mcp.filter((entry) => entry.trust === trust).length;
