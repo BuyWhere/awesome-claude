@@ -1,5 +1,14 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.3](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.2...mcp-v0.14.3) (2026-07-28)
+
+
+### Bug Fixes
+
+* **mcp:** read docsUrl and sourceUrl in duplicate detection ([#5622](https://github.com/JSONbored/awesome-claude/issues/5622)) ([698b9b0](https://github.com/JSONbored/awesome-claude/commit/698b9b0af28a8f8aa326123da71a1f9f8377fe9f)), closes [#5590](https://github.com/JSONbored/awesome-claude/issues/5590)
+* **registry:** ignore self-referential githubUrl as source ([c053efb](https://github.com/JSONbored/awesome-claude/commit/c053efbdbfbaa8d0930dc646cb5260be6a1b55c4))
+* **registry:** ignore self-referential githubUrl as source ([740ce20](https://github.com/JSONbored/awesome-claude/commit/740ce20aa0f1e9ebd1528e21f284b4705bbab677)), closes [#5580](https://github.com/JSONbored/awesome-claude/issues/5580)
+
 ## [0.14.2](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.1...mcp-v0.14.2) (2026-07-26)
 
 
