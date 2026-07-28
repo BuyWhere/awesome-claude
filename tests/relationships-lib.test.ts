@@ -738,6 +738,21 @@ describe("buildRegistryRelationGraph", () => {
     expect(graph.generatedAt).toBe("2025-06-01T00:00:00.000Z");
   });
 
+  it("derives the same generatedAt regardless of entry order", () => {
+    const undated = entry({ slug: "undated" });
+    const dated = entry({
+      slug: "dated",
+      dateAdded: "2025-06-01",
+      contentUpdatedAt: "2026-02-03",
+    });
+
+    const undatedFirst = buildRegistryRelationGraph([undated, dated]);
+    const datedFirst = buildRegistryRelationGraph([dated, undated]);
+
+    expect(undatedFirst.generatedAt).toBe("2026-02-03T00:00:00.000Z");
+    expect(undatedFirst.generatedAt).toBe(datedFirst.generatedAt);
+  });
+
   it("indexes candidates via shared repo, url, domain, token, and collection refs", () => {
     const member = entry({
       category: "skills",
