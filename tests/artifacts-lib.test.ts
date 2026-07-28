@@ -583,6 +583,48 @@ describe("buildEntryTrustSignals", () => {
     ]);
   });
 
+  it("does not count self-referential githubUrl as a source", () => {
+    const entry = syntheticEntry("mcp", "self-link-only", {
+      repoUrl: "",
+      documentationUrl: "",
+      downloadUrl: "",
+      docsUrl: "",
+      packageUrl: "",
+      repositoryUrl: "",
+      sourceUrl: "",
+      websiteUrl: "",
+      sourceUrls: [],
+      retrievalSources: [],
+      githubUrl:
+        "https://github.com/JSONbored/awesome-claude/blob/main/content/mcp/self-link-only.mdx",
+    });
+    const signals = buildEntryTrustSignals(entry);
+    expect(signals.sourceStatus).toBe("missing");
+    expect(signals.sourceUrlCount).toBe(0);
+    expect(signals.sourceUrls).toEqual([]);
+  });
+
+  it("still counts a real external githubUrl as a source", () => {
+    const entry = syntheticEntry("mcp", "external-gh", {
+      repoUrl: "",
+      documentationUrl: "",
+      downloadUrl: "",
+      docsUrl: "",
+      packageUrl: "",
+      repositoryUrl: "",
+      sourceUrl: "",
+      websiteUrl: "",
+      sourceUrls: [],
+      retrievalSources: [],
+      githubUrl: "https://github.com/example/real-repo",
+    });
+    const signals = buildEntryTrustSignals(entry);
+    expect(signals.sourceStatus).toBe("available");
+    expect(signals.sourceUrls).toEqual([
+      "https://github.com/example/real-repo",
+    ]);
+  });
+
   it.each([
     [
       "downloadSha256",
