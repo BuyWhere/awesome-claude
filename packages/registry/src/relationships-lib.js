@@ -416,23 +416,21 @@ export function buildRegistryRelationGraph(entries, params = {}) {
     url: entryUrl(entry),
     related: buildEntryRelations(entry, candidatesFor(entry), { limit }),
   }));
+  const latestEntryDate = entries
+    .map((entry) =>
+      String(entry.contentUpdatedAt || entry.dateAdded || "").slice(0, 10),
+    )
+    .filter(Boolean)
+    .sort()
+    .at(-1);
 
   return {
     schemaVersion: 1,
     kind: "registry-relation-graph",
     generatedAt:
       params.generatedAt ||
-      (entries[0]?.dateAdded
-        ? `${entries
-            .map((entry) =>
-              String(entry.contentUpdatedAt || entry.dateAdded || "").slice(
-                0,
-                10,
-              ),
-            )
-            .filter(Boolean)
-            .sort()
-            .at(-1)}T00:00:00.000Z`
+      (latestEntryDate
+        ? `${latestEntryDate}T00:00:00.000Z`
         : "1970-01-01T00:00:00.000Z"),
     relationTypes: REGISTRY_RELATION_TYPES,
     maxRelationsPerEntry: limit,
