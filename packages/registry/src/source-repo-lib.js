@@ -18,6 +18,15 @@ const OWNER_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/;
 // GitHub repository names: alphanumeric plus "-", "_", and ".".
 const REPO_PATTERN = /^[A-Za-z0-9._-]+$/;
 
+// URL schemes this parser actually supports: the two web schemes plus the git
+// transports authors paste from clone dialogs ("git+https://" is normalized to
+// "https:" before parsing). Anything outside this set is rejected before the
+// checks below run, so a scheme the parser never intended to accept — ftp:,
+// file:, data: — cannot slip an embedded-credential URL past the http/https
+// userinfo guard by simply changing its scheme (#5588). Mirrors the protocol
+// allowlist `isPublicGitHubHostUrl` in `source-url-lib.js` already applies.
+const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:", "git:", "ssh:"]);
+
 // First path segments that are GitHub product surfaces, never repo owners.
 // GitHub reserves these names, so "github.com/sponsors/x" or
 // "github.com/features/copilot" is a product/marketing/auth page, not a
@@ -122,6 +131,7 @@ export function parseGitHubRepoUrl(value) {
     } catch {
       return null;
     }
+    if (!ALLOWED_URL_PROTOCOLS.has(url.protocol)) return null;
     const ownerRepo = ownerRepoFromPath(url.pathname);
     if (!ownerRepo) return null;
     if (
