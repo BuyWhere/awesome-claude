@@ -1198,6 +1198,33 @@ describe("validateSubmission shared guardrails", () => {
     );
   });
 
+  it.each(["sponsors", "features", "marketplace", "pricing", "@sponsors"])(
+    "rejects reserved GitHub product-surface contact handle %j (#5683)",
+    (contact_email) => {
+      const result = validateSubmission({
+        title: "Add MCP Server: Demo",
+        body: buildValidBody({ ...validMcpFields, contact_email }),
+      });
+      expect(result.errors).toEqual(
+        expect.arrayContaining([
+          "Invalid public contact: use a GitHub handle, GitHub profile URL, or email",
+        ]),
+      );
+    },
+  );
+
+  it("still accepts a genuine non-reserved bare GitHub handle", () => {
+    const result = validateSubmission({
+      title: "Add MCP Server: Demo",
+      body: buildValidBody({ ...validMcpFields, contact_email: "@octocat" }),
+    });
+    expect(result.errors).not.toEqual(
+      expect.arrayContaining([
+        "Invalid public contact: use a GitHub handle, GitHub profile URL, or email",
+      ]),
+    );
+  });
+
   it("rejects GitHub profile contact URLs with embedded userinfo", () => {
     const result = validateSubmission({
       title: "Add MCP Server: Demo",

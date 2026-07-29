@@ -10,6 +10,7 @@
  */
 import categorySpec from "./category-spec.json" with { type: "json" };
 import { normalizeBrandDomain } from "./brand-assets.js";
+import { RESERVED_OWNERS } from "./source-repo.js";
 import {
   hasAffiliateParam,
   isLikelyAffiliateUrl,
@@ -723,6 +724,8 @@ function isValidPublicContact(value) {
     handle.length <= 39 &&
     !handle.startsWith("-") &&
     !handle.endsWith("-") &&
+    // Parity with isPublicGitHubProfileUrl / MCP isGitHubHandle (#5562 / #5683).
+    !RESERVED_OWNERS.has(handle.toLowerCase()) &&
     [...handle].every(
       (char) =>
         (char >= "A" && char <= "Z") ||
