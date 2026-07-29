@@ -80,6 +80,15 @@ describe("registry-asset-lib install complexity", () => {
       }),
     ).toBe("higher");
   });
+
+  it("counts commandSyntax when installCommand is absent (#5686)", () => {
+    expect(
+      entryInstallComplexity({
+        category: "commands",
+        commandSyntax: "/review-pr --full",
+      }),
+    ).toBe("low");
+  });
 });
 
 describe("registry-asset-lib categoryPrimaryAsset fallbacks", () => {
