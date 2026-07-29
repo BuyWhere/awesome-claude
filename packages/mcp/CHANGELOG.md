@@ -1,5 +1,14 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.5](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.4...mcp-v0.14.5) (2026-07-29)
+
+
+### Bug Fixes
+
+* **mcp:** declare createTimeoutFetch in remote-proxy.d.ts ([#5648](https://github.com/JSONbored/awesome-claude/issues/5648)) ([4105a6d](https://github.com/JSONbored/awesome-claude/commit/4105a6d8516d5904cca2118e53a9ce9dae20c1ee)), closes [#5646](https://github.com/JSONbored/awesome-claude/issues/5646)
+* **mcp:** declare recommendForTask in registry.d.ts ([#5647](https://github.com/JSONbored/awesome-claude/issues/5647)) ([fd10641](https://github.com/JSONbored/awesome-claude/commit/fd106413222024f3ed252c02b54beb871343c088)), closes [#5644](https://github.com/JSONbored/awesome-claude/issues/5644)
+* **mcp:** sync TRACKING_QUERY_KEYS with registry AFFILIATE_PARAMS ([#5655](https://github.com/JSONbored/awesome-claude/issues/5655)) ([0ce877f](https://github.com/JSONbored/awesome-claude/commit/0ce877fc14865d1d579e8229bd805ed9c2178c99)), closes [#5645](https://github.com/JSONbored/awesome-claude/issues/5645)
+
 ## [0.14.4](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.3...mcp-v0.14.4) (2026-07-28)
 
 
