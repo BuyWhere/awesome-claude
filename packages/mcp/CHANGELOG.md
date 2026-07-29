@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.6](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.5...mcp-v0.14.6) (2026-07-29)
+
+
+### Bug Fixes
+
+* **mcp:** add token-OR query fallback to search/list/updates ([#5663](https://github.com/JSONbored/awesome-claude/issues/5663)) ([4e8503e](https://github.com/JSONbored/awesome-claude/commit/4e8503e85ff831ea95c3b34c7fba053b21d37134)), closes [#5643](https://github.com/JSONbored/awesome-claude/issues/5643)
+
 ## [0.14.5](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.4...mcp-v0.14.5) (2026-07-29)
 
 
