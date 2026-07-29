@@ -1,5 +1,16 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.7](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.6...mcp-v0.14.7) (2026-07-29)
+
+
+### Bug Fixes
+
+* **mcp:** add nextOffset to category resource payload ([#5699](https://github.com/JSONbored/awesome-claude/issues/5699)) ([9fe1592](https://github.com/JSONbored/awesome-claude/commit/9fe159279a6ef68476ce641bc1bc52d2da2ee5e9)), closes [#5684](https://github.com/JSONbored/awesome-claude/issues/5684)
+* **mcp:** count commandSyntax in entryInstallComplexity ([d049918](https://github.com/JSONbored/awesome-claude/commit/d049918fc2f2899fc55ef5a10a58e42645887b73))
+* **mcp:** count commandSyntax in entryInstallComplexity ([b41f18c](https://github.com/JSONbored/awesome-claude/commit/b41f18cfc671e12fdcf8f5abf93706c11a821aa3)), closes [#5686](https://github.com/JSONbored/awesome-claude/issues/5686)
+* **mcp:** flag affiliate path segments in submissions ([#5687](https://github.com/JSONbored/awesome-claude/issues/5687)) ([#5691](https://github.com/JSONbored/awesome-claude/issues/5691)) ([2157b9f](https://github.com/JSONbored/awesome-claude/commit/2157b9f44d969d1a2f4f0518bd37f86f78f4c0be))
+* **mcp:** recognize antigravity in platform alias maps ([#5696](https://github.com/JSONbored/awesome-claude/issues/5696)) ([f5701f0](https://github.com/JSONbored/awesome-claude/commit/f5701f03b8c221c234512292caa6007f726ad0e8)), closes [#5685](https://github.com/JSONbored/awesome-claude/issues/5685)
+
 ## [0.14.6](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.5...mcp-v0.14.6) (2026-07-29)
 
 
