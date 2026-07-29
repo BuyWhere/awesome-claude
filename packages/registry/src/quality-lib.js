@@ -396,8 +396,12 @@ export function buildEntrySourceHealth(entry, referenceDate) {
     referenceDate,
   );
   const pkg = derivePackageTrust(entry);
-  const hasSafetyNotes = hasMeaningfulNotes(entry.safetyNotes);
-  const hasPrivacyNotes = hasMeaningfulNotes(entry.privacyNotes);
+  const hasSafetyNotes = hasMeaningfulNotes(
+    entry.safetyNotesList ?? entry.safetyNotes,
+  );
+  const hasPrivacyNotes = hasMeaningfulNotes(
+    entry.privacyNotesList ?? entry.privacyNotes,
+  );
   const riskBearing = isRiskBearingSourceCategory(entry.category);
 
   const attentionReasons = [];
