@@ -1,0 +1,24 @@
+# Superagent (https://superagent.sh) GitHub App configuration — PR security scanning + contributor trust
+# scoring. All fields are optional; anything omitted falls back to Superagent's own defaults.
+prScan:
+  enabled: true
+
+# Contributor-trust scoring is DISABLED (2026-07-29), matching JSONbored/loopover and JSONbored/metagraphed.
+#
+# It does not discriminate on these repos: established repeat contributors with dozens of merged PRs were
+# scored "dangerous" (10/100) on volume and velocity alone. The `trustedAuthors` allowlist that used to sit
+# here was meant to fix exactly that and did NOT work -- a listed author was still flagged
+# `action_required` -- so it has been dropped rather than carried along inert and misleading.
+#
+# The verdict also has no consumer any more: LoopOver lists this check under `gate.ignoredCheckRuns`
+# (loopover#9813) on all three gate repos, so a non-passing result no longer gates, pends, or holds
+# anything. Leaving it enabled would only produce a permanently red check on contributor PRs that nothing
+# acts on -- noise that makes good contributors think they have failed something.
+#
+# The SECURITY SCAN above stays enabled and still gates CI normally: that is the protection worth having,
+# and it is a different check from the same app.
+contributorTrust:
+  enabled: false
+
+comments:
+  mode: detailed
