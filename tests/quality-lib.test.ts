@@ -578,6 +578,25 @@ describe("buildEntrySourceHealth", () => {
     expect(health.attentionReasons).toEqual([]);
   });
 
+  it("accepts safetyNotesList/privacyNotesList when string fields are empty (#5638)", () => {
+    const health = buildEntrySourceHealth(
+      entry({
+        category: "mcp",
+        repoUrl: "https://github.com/a/b",
+        dateAdded: "2026-05-01",
+        safetyNotes: [],
+        privacyNotes: [],
+        safetyNotesList: ["review before install"],
+        privacyNotesList: ["no telemetry"],
+      }),
+      REFERENCE,
+    );
+    expect(health.hasSafetyNotes).toBe(true);
+    expect(health.hasPrivacyNotes).toBe(true);
+    expect(health.attentionReasons).not.toContain("missing-safety-notes");
+    expect(health.attentionReasons).not.toContain("missing-privacy-notes");
+  });
+
   it("treats stale freshness as an attention reason", () => {
     const health = buildEntrySourceHealth(
       entry({
