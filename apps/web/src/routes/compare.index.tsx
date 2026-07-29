@@ -113,6 +113,7 @@ export const Route = createFileRoute("/compare/")({
         property: "og:description",
         content: "Side-by-side comparison of Claude workflow resources.",
       },
+      { property: "og:url", content: absoluteUrl("/compare") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/compare") }],
     scripts: [
