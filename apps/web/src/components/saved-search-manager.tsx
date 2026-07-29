@@ -460,6 +460,8 @@ export function SavedSearchManager({ open, onOpenChange, trigger }: ManagerProps
                   )}
                   {msg?.id === s.id && (
                     <p
+                      role="status"
+                      aria-live="polite"
                       className={cn(
                         "text-[11px]",
                         msg.ok ? "text-trust-trusted" : "text-trust-blocked",
