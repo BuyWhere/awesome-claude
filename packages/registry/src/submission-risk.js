@@ -8,6 +8,8 @@ import { parseSafeFrontmatter } from "./frontmatter.js";
 import {
   hasBase64DecodedShell,
   hasPipeToShellInstall,
+  hasRecursiveForceRemove,
+  hasWorldWritableChmod,
 } from "./command-safety-lib.js";
 import {
   AFFILIATE_PARAMS,
@@ -981,6 +983,18 @@ function isLikelyAffiliateUrl(value) {
   }
 }
 
+// True when install text contains recursive-force rm or world-writable chmod,
+// using the same hardened detectors as scanDangerousShellPatterns (#5640).
+// Line-by-line like the curl/base64 helpers; installText is already lowercased.
+function hasDestructiveInstallShellPatterns(installText) {
+  for (const line of String(installText ?? "").split(/\r?\n/)) {
+    if (!line) continue;
+    if (hasRecursiveForceRemove(line, line)) return true;
+    if (hasWorldWritableChmod(line, line)) return true;
+  }
+  return false;
+}
+
 function githubSourceRef(value) {
   const raw = normalizeText(value);
   if (!raw) return null;
@@ -1312,7 +1326,8 @@ function addContentRiskSignals(report, fields, text) {
     hasUnsafeCurlWgetPipeToShell(installText) ||
     /\b(invoke-expression|iex)\b/i.test(installText) ||
     hasUnsafeBase64DecodedShell(installText) ||
-    /\bpowershell\b[\s\S]{0,80}\b-encodedcommand\b/i.test(installText)
+    /\bpowershell\b[\s\S]{0,80}\b-encodedcommand\b/i.test(installText) ||
+    hasDestructiveInstallShellPatterns(installText)
   ) {
     addFlag(
       report,

