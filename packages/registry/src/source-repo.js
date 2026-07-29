@@ -5,4 +5,4 @@
  * that surface so existing `@heyclaude/registry/source-repo` imports stay
  * unchanged.
  */
-export { parseGitHubRepoUrl } from "./source-repo-lib.js";
+export { parseGitHubRepoUrl, RESERVED_OWNERS } from "./source-repo-lib.js";
