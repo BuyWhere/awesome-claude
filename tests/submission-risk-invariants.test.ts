@@ -985,6 +985,52 @@ describe("embedded_secret PEM / Slack / Stripe formats (#5557)", () => {
   });
 });
 
+describe("embedded_secret GitHub App/OAuth token prefixes (#5639)", () => {
+  // Build fixtures at runtime so scanners do not treat the test file as a
+  // leaked-secret diff (literal gho_/github_pat_ bodies closed #5652).
+  function syntheticGithubToken(prefix: string, bodyLength: number) {
+    return `${prefix}${"x".repeat(bodyLength)}`;
+  }
+
+  function embeddedSecretFlagIds(secret: string) {
+    const draft = buildSubmissionPrDraft({
+      ...validMcpFields,
+      name: "Secret Leak MCP",
+      slug: "secret-leak-mcp",
+      description: `Demo key ${secret} must be caught`,
+      safety_notes: "Runs a local MCP server process with user-selected tools.",
+      privacy_notes: "Only handles context selected by the user.",
+    });
+    const validation = validateSubmission(draft);
+    return analyzeSubmissionDraftRisk(draft, validation).reviewFlags.map(
+      (flag) => flag.id,
+    );
+  }
+
+  it.each([
+    ["gho", 30],
+    ["ghu", 30],
+    ["ghs", 30],
+    ["ghr", 30],
+  ] as const)("flags %s_ tokens like ghp_", (kind, bodyLength) => {
+    const secret = syntheticGithubToken(`${kind}_`, bodyLength);
+    expect(embeddedSecretFlagIds(secret)).toEqual(
+      expect.arrayContaining(["embedded_secret"]),
+    );
+  });
+
+  it("still flags classic personal-access and fine-grained prefixes", () => {
+    expect(embeddedSecretFlagIds(syntheticGithubToken("ghp_", 30))).toEqual(
+      expect.arrayContaining(["embedded_secret"]),
+    );
+    expect(
+      embeddedSecretFlagIds(
+        syntheticGithubToken(["github", "pat"].join("_") + "_", 40),
+      ),
+    ).toEqual(expect.arrayContaining(["embedded_secret"]));
+  });
+});
+
 describe("unsafe_install_pipeline curl|wget to SHELL_TOKENS (#5480)", () => {
   it.each(["zsh", "dash", "ash", "bash", "sh"])(
     "flags curl piped to %s",
