@@ -83,7 +83,7 @@ export function categoryPrimaryAsset(entry) {
 
 export function entryInstallComplexity(entry) {
   const pieces = [
-    entry.installCommand,
+    entry.installCommand || entry.commandSyntax,
     entry.configSnippet,
     entry.downloadUrl,
     entry.prerequisites,

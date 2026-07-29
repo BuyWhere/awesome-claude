@@ -8555,3 +8555,30 @@ describe("registry-compare-lib buildCompareEntriesResponse", () => {
     expect(response.entries).toHaveLength(1);
   });
 });
+
+describe("entry.compare installComplexity commandSyntax fallback (#5686)", () => {
+  it("reports low for commands entries that only set commandSyntax", () => {
+    const row = buildCompareEntryRow(
+      makeEntry({
+        category: "commands",
+        slug: "review-pr",
+        installCommand: "",
+        commandSyntax: "/review-pr --full",
+        configSnippet: "",
+        downloadUrl: "",
+        prerequisites: "",
+      }),
+      "",
+      {
+        normalizePlatform,
+        buildSkillPlatformCompatibility,
+        entryInstallComplexity,
+        categoryPrimaryAsset,
+        sourceSummary,
+        entryTrustSummary,
+        entryCanonicalUrl,
+      },
+    );
+    expect(row.installComplexity).toBe("low");
+  });
+});
