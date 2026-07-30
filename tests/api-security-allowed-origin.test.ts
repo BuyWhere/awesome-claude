@@ -20,7 +20,9 @@ describe("isAllowedOrigin", () => {
       true,
     );
     expect(
-      isAllowedOrigin(requestWithOrigin("https://pr-123.zeronode.workers.dev")),
+      isAllowedOrigin(
+        requestWithOrigin("https://pr-123-heyclaude-prod.zeronode.workers.dev"),
+      ),
     ).toBe(true);
     expect(isAllowedOrigin(requestWithOrigin("http://localhost:3000"))).toBe(
       true,
