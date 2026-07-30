@@ -20,6 +20,9 @@ import {
   type BriefHubSectionId,
 } from "@/lib/brief-entry-cta-events";
 import { absoluteUrl } from "@/lib/seo";
+import { breadcrumbScript } from "@/lib/seo-jsonld";
+import { stringifyJsonLd } from "@/lib/json-ld";
+import { briefItemListJsonLd } from "@/lib/brief-jsonld-lib";
 
 type PublishedBriefSummary = { number: number; periodThrough: string; title: string };
 
@@ -57,6 +60,13 @@ export const Route = createFileRoute("/brief")({
       { property: "og:url", content: absoluteUrl("/brief") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/brief") }],
+    scripts: [
+      breadcrumbScript([{ name: "Weekly Brief", path: "/brief" }]),
+      {
+        type: "application/ld+json",
+        children: stringifyJsonLd(briefItemListJsonLd(BRIEF_ISSUES)),
+      },
+    ],
   }),
   component: BriefPage,
 });
