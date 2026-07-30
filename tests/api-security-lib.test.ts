@@ -63,7 +63,14 @@ describe("isAllowedOrigin", () => {
       true,
     );
     expect(
-      isAllowedOrigin(requestWithOrigin("https://pr-123.zeronode.workers.dev")),
+      isAllowedOrigin(
+        requestWithOrigin("https://heyclaude-prod.zeronode.workers.dev"),
+      ),
+    ).toBe(true);
+    expect(
+      isAllowedOrigin(
+        requestWithOrigin("https://pr-123-heyclaude-prod.zeronode.workers.dev"),
+      ),
     ).toBe(true);
     expect(isAllowedOrigin(requestWithOrigin("http://localhost:3000"))).toBe(
       true,
@@ -81,20 +88,24 @@ describe("isAllowedOrigin", () => {
     ).toBe(false);
   });
 
-  it("rejects preview hosts with invalid subdomain characters", () => {
-    expect(
-      isAllowedOrigin(requestWithOrigin("https://pr_123.zeronode.workers.dev")),
-    ).toBe(false);
-    expect(
-      isAllowedOrigin(
-        requestWithOrigin("https://pr..123.zeronode.workers.dev"),
-      ),
-    ).toBe(false);
+  it("rejects sibling and lookalike zeronode worker origins", () => {
+    for (const origin of [
+      "https://evil.zeronode.workers.dev",
+      "https://pr-123.zeronode.workers.dev",
+      "https://heyclaude-prod-next.zeronode.workers.dev",
+      "https://heyclaude-dev.zeronode.workers.dev",
+      "https://pr_123-heyclaude-prod.zeronode.workers.dev",
+      "https://pr..123-heyclaude-prod.zeronode.workers.dev",
+    ]) {
+      expect(isAllowedOrigin(requestWithOrigin(origin)), origin).toBe(false);
+    }
   });
 
-  it("allows uppercase letters in preview worker hostnames", () => {
+  it("allows uppercase letters in HeyClaude preview worker hostnames", () => {
     expect(
-      isAllowedOrigin(requestWithOrigin("https://PR-123.zeronode.workers.dev")),
+      isAllowedOrigin(
+        requestWithOrigin("https://PR-123-HEYCLAUDE-PROD.zeronode.workers.dev"),
+      ),
     ).toBe(true);
   });
 

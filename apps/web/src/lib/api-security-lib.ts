@@ -70,10 +70,15 @@ export const __rateLimitTestHooks = {
   maxBuckets: MAX_RATE_BUCKETS,
 };
 
+// Preview origins must be HeyClaude production Workers Builds hosts only.
+// This Cloudflare account also hosts sibling projects, so a bare
+// `*.zeronode.workers.dev` pattern would trust unrelated worker Origins on
+// mutating browser APIs. Match the same worker-label rule as
+// scripts/lib/preview-url-host.mjs (`heyclaude-prod` or `*-heyclaude-prod`).
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https:\/\/heyclau\.de$/i,
   /^https:\/\/dev\.heyclau\.de$/i,
-  /^https:\/\/[a-z0-9-]+\.zeronode\.workers\.dev$/i,
+  /^https:\/\/(?:[a-z0-9-]+-)?heyclaude-prod\.zeronode\.workers\.dev$/i,
   /^http:\/\/localhost:\d+$/i,
   /^http:\/\/127\.0\.0\.1:\d+$/i,
 ];
