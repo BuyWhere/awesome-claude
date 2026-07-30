@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, stripSearchParams } from "@tanstack/react-router";
 import { PageContainer } from "@/components/page-container";
 import { absoluteUrl } from "@/lib/seo";
 import { breadcrumbScript, itemListScript } from "@/lib/seo-jsonld";
 import { createServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { ArrowUpRight, Search, Sparkles, X } from "lucide-react";
 import type { JobListing, JobTier } from "@/types/registry";
 import { normalizeJobListing } from "@/lib/job-listing-lib";
@@ -46,7 +47,48 @@ const loadPublicJobs = createServerFn({ method: "GET" }).handler(async () => {
   return buildPublicJobsIndex(await getJobs()).entries;
 });
 
+type RemoteFilter = "all" | "remote" | "onsite";
+type SortMode = "default" | "newest" | "salary";
+
+const defaultSearch = {
+  q: "",
+  tier: "all" as const,
+  remote: "all" as const,
+  type: "all",
+  freshOnly: false,
+  featuredOnly: false,
+  sortMode: "default" as const,
+};
+
+const searchBool = z
+  .union([z.boolean(), z.literal("true"), z.literal("false"), z.literal("1"), z.literal("0")])
+  .transform((value) => value === true || value === "true" || value === "1")
+  .catch(false);
+
+const jobsSearchSchema = z.object({
+  q: z.string().catch(defaultSearch.q).default(defaultSearch.q),
+  tier: z
+    .enum(["all", "featured", "sponsored", "standard", "free"])
+    .catch(defaultSearch.tier)
+    .default(defaultSearch.tier),
+  remote: z
+    .enum(["all", "remote", "onsite"])
+    .catch(defaultSearch.remote)
+    .default(defaultSearch.remote),
+  type: z.string().catch(defaultSearch.type).default(defaultSearch.type),
+  freshOnly: searchBool.default(defaultSearch.freshOnly),
+  featuredOnly: searchBool.default(defaultSearch.featuredOnly),
+  sortMode: z
+    .enum(["default", "newest", "salary"])
+    .catch(defaultSearch.sortMode)
+    .default(defaultSearch.sortMode),
+});
+
 export const Route = createFileRoute("/jobs/")({
+  validateSearch: jobsSearchSchema,
+  search: {
+    middlewares: [stripSearchParams(defaultSearch)],
+  },
   loader: async () => {
     return {
       jobs: (await loadPublicJobs()).map(normalizeJobListing).filter((job) => job.slug),
@@ -99,9 +141,6 @@ export const Route = createFileRoute("/jobs/")({
   component: JobsPage,
 });
 
-type RemoteFilter = "all" | "remote" | "onsite";
-type SortMode = "default" | "newest" | "salary";
-
 type JobsFilterState = {
   q: string;
   tier: JobTier | "all";
@@ -147,15 +186,38 @@ function activeJobsFilterCount(filters: JobsFilterState): number {
 
 function JobsPage() {
   const loaderData = Route.useLoaderData();
+  const sp = Route.useSearch();
+  const navigate = Route.useNavigate();
   const [jobs, setJobs] = useState<JobListing[]>(loaderData.jobs);
   const [loadingJobs, setLoadingJobs] = useState(loaderData.jobs.length === 0);
-  const [q, setQ] = useState("");
-  const [tier, setTier] = useState<JobTier | "all">("all");
-  const [remote, setRemote] = useState<RemoteFilter>("all");
-  const [type, setType] = useState<string>("all");
-  const [freshOnly, setFreshOnly] = useState(false);
-  const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [sortMode, setSortMode] = useState<SortMode>("default");
+  // Debounce free-text query: local state drives the input; URL updates 250ms after idle (#5711).
+  const [qInput, setQInput] = useState(sp.q);
+  useEffect(() => {
+    setQInput(sp.q);
+  }, [sp.q]);
+  useEffect(() => {
+    if (qInput === sp.q) return;
+    const t = window.setTimeout(() => {
+      navigate({ search: (prev: typeof sp) => ({ ...prev, q: qInput }), replace: true });
+    }, 250);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qInput]);
+
+  const q = sp.q;
+  const tier = sp.tier;
+  const remote = sp.remote;
+  const type = sp.type;
+  const freshOnly = sp.freshOnly;
+  const featuredOnly = sp.featuredOnly;
+  const sortMode = sp.sortMode;
+
+  const setFilters = useCallback(
+    (patch: Partial<typeof sp>) => {
+      navigate({ search: (prev: typeof sp) => ({ ...prev, ...patch }) });
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -255,14 +317,12 @@ function JobsPage() {
     [hasFilters, filterState, countForFilters],
   );
 
-  const applyFilterPatch = useCallback((patch: Partial<JobsFilterState>) => {
-    if (patch.q !== undefined) setQ(patch.q);
-    if (patch.tier !== undefined) setTier(patch.tier);
-    if (patch.remote !== undefined) setRemote(patch.remote);
-    if (patch.type !== undefined) setType(patch.type);
-    if (patch.freshOnly !== undefined) setFreshOnly(patch.freshOnly);
-    if (patch.featuredOnly !== undefined) setFeaturedOnly(patch.featuredOnly);
-  }, []);
+  const applyFilterPatch = useCallback(
+    (patch: Partial<JobsFilterState>) => {
+      setFilters(patch);
+    },
+    [setFilters],
+  );
 
   const onFilterSelect = useCallback(
     (
@@ -290,9 +350,9 @@ function JobsPage() {
       const next = value as JobTier | "all";
       if (next === tier) return;
       onFilterSelect("tier", next, next !== "all", { tier: next });
-      setTier(next);
+      setFilters({ tier: next });
     },
-    [onFilterSelect, tier],
+    [onFilterSelect, setFilters, tier],
   );
 
   const onRemoteFilter = useCallback(
@@ -300,31 +360,31 @@ function JobsPage() {
       const next = value as RemoteFilter;
       if (next === remote) return;
       onFilterSelect("remote", next, next !== "all", { remote: next });
-      setRemote(next);
+      setFilters({ remote: next });
     },
-    [onFilterSelect, remote],
+    [onFilterSelect, remote, setFilters],
   );
 
   const onTypeFilter = useCallback(
     (value: string) => {
       if (value === type) return;
       onFilterSelect("type", value, value !== "all", { type: value });
-      setType(value);
+      setFilters({ type: value });
     },
-    [onFilterSelect, type],
+    [onFilterSelect, setFilters, type],
   );
 
   const onFreshToggle = useCallback(() => {
     const next = !freshOnly;
     onFilterSelect("fresh", next ? "on" : "off", next, { freshOnly: next });
-    setFreshOnly(next);
-  }, [freshOnly, onFilterSelect]);
+    setFilters({ freshOnly: next });
+  }, [freshOnly, onFilterSelect, setFilters]);
 
   const onFeaturedToggle = useCallback(() => {
     const next = !featuredOnly;
     onFilterSelect("featured", next ? "on" : "off", next, { featuredOnly: next });
-    setFeaturedOnly(next);
-  }, [featuredOnly, onFilterSelect]);
+    setFilters({ featuredOnly: next });
+  }, [featuredOnly, onFilterSelect, setFilters]);
 
   const onSortSelect = useCallback(
     (value: SortMode) => {
@@ -333,9 +393,9 @@ function JobsPage() {
         jobsIndexSortSelectAnalyticsEvent(),
         jobsIndexSortSelectAnalyticsData(value, filtered.length, jobs.length),
       );
-      setSortMode(value);
+      setFilters({ sortMode: value });
     },
-    [filtered.length, jobs.length, sortMode],
+    [filtered.length, jobs.length, setFilters, sortMode],
   );
 
   const onClearFilters = useCallback(() => {
@@ -347,13 +407,16 @@ function JobsPage() {
         jobs.length,
       ),
     );
-    setQ("");
-    setTier("all");
-    setRemote("all");
-    setType("all");
-    setFreshOnly(false);
-    setFeaturedOnly(false);
-  }, [filterState, jobs.length]);
+    setFilters({
+      q: "",
+      tier: "all",
+      remote: "all",
+      type: "all",
+      freshOnly: false,
+      featuredOnly: false,
+    });
+    setQInput("");
+  }, [filterState, jobs.length, setFilters]);
 
   const onStatClick = useCallback(
     (statId: JobsIndexStatId, count: number) => {
@@ -363,14 +426,17 @@ function JobsPage() {
         jobsIndexStatAnalyticsEvent(),
         jobsIndexStatAnalyticsData(statId, count, jobs.length),
       );
-      if (patch.q !== undefined) setQ(patch.q);
-      if (patch.tier !== undefined) setTier(patch.tier as JobTier | "all");
-      if (patch.remote !== undefined) setRemote(patch.remote as RemoteFilter);
-      if (patch.type !== undefined) setType(patch.type);
-      if (patch.freshOnly !== undefined) setFreshOnly(patch.freshOnly);
-      if (patch.featuredOnly !== undefined) setFeaturedOnly(patch.featuredOnly);
+      setFilters({
+        ...(patch.q !== undefined ? { q: patch.q } : {}),
+        ...(patch.tier !== undefined ? { tier: patch.tier as JobTier | "all" } : {}),
+        ...(patch.remote !== undefined ? { remote: patch.remote as RemoteFilter } : {}),
+        ...(patch.type !== undefined ? { type: patch.type } : {}),
+        ...(patch.freshOnly !== undefined ? { freshOnly: patch.freshOnly } : {}),
+        ...(patch.featuredOnly !== undefined ? { featuredOnly: patch.featuredOnly } : {}),
+      });
+      if (patch.q !== undefined) setQInput(patch.q);
     },
-    [jobs.length],
+    [jobs.length, setFilters],
   );
 
   const headlineStats: Array<{ id: JobsIndexStatId; label: string; count: number }> = [
@@ -433,8 +499,8 @@ function JobsPage() {
           <div className="relative min-w-[200px] flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-subtle" />
             <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              value={qInput}
+              onChange={(e) => setQInput(e.target.value)}
               placeholder="Search title, company, stack…"
               aria-label="Search jobs by title, company, or stack"
               className="h-9 w-full rounded-md border border-border bg-background pl-8 pr-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent/40"
