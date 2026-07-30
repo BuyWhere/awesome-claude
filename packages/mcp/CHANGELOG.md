@@ -1,5 +1,12 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.8](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.7...mcp-v0.14.8) (2026-07-30)
+
+
+### Bug Fixes
+
+* **mcp:** gate one-click install targets behind npx/uvx allowlist ([#5718](https://github.com/JSONbored/awesome-claude/issues/5718)) ([d655ddd](https://github.com/JSONbored/awesome-claude/commit/d655ddd311801438292ec58e9193b690f162ce25)), closes [#5710](https://github.com/JSONbored/awesome-claude/issues/5710)
+
 ## [0.14.7](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.6...mcp-v0.14.7) (2026-07-29)
 
 
