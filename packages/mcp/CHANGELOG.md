@@ -1,5 +1,13 @@
 # @heyclaude/mcp Changelog
 
+## [0.14.9](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.8...mcp-v0.14.9) (2026-07-30)
+
+
+### Bug Fixes
+
+* **mcp:** return domain error for unmatched read-only tool dispatch ([#5725](https://github.com/JSONbored/awesome-claude/issues/5725)) ([282c299](https://github.com/JSONbored/awesome-claude/commit/282c2994b3964e3d0e996af79970767368681289)), closes [#5715](https://github.com/JSONbored/awesome-claude/issues/5715)
+* **mcp:** treat empty limit/offset query params as absent ([#5726](https://github.com/JSONbored/awesome-claude/issues/5726)) ([ac40ced](https://github.com/JSONbored/awesome-claude/commit/ac40ced64b8662ec583133133ba8fe1c91a5b007)), closes [#5714](https://github.com/JSONbored/awesome-claude/issues/5714)
+
 ## [0.14.8](https://github.com/JSONbored/awesome-claude/compare/mcp-v0.14.7...mcp-v0.14.8) (2026-07-30)
 
 
