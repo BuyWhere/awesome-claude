@@ -3,18 +3,18 @@ title: Metagraphed MCP Server for Claude
 slug: metagraphed-mcp
 category: mcp
 description: >-
-  Public Streamable-HTTP MCP server for the Metagraphed Bittensor subnet
-  integration registry — discover subnets, check health and economics, read
-  metagraph data, and look up accounts or API surfaces without wallets or
-  signing.
+  Public Streamable-HTTP MCP server for Metagraphed, the open registry and block
+  explorer for Bittensor — discover subnets, check probe-derived health,
+  economics and metagraph data, and call catalogued subnet APIs. Anonymous
+  access is read-only; no wallet or signing.
 cardDescription: >-
-  Read-only Metagraphed MCP: discover Bittensor subnets, health, economics,
-  and metagraph data over streamable HTTP.
+  Metagraphed MCP: 240+ read-only tools for Bittensor subnet discovery, health,
+  economics, and metagraph data over streamable HTTP.
 seoTitle: Metagraphed MCP Server for Claude — Bittensor Subnet Registry
 seoDescription: >-
   Connect Claude to Metagraphed's public Streamable-HTTP MCP at
-  api.metagraph.sh/mcp to discover Bittensor subnets, health, economics,
-  metagraph rows, and integration helpers — read-only, not a wallet tool.
+  api.metagraph.sh/mcp for 240+ read-only tools covering Bittensor subnet
+  discovery, health, economics, metagraph rows, and integration helpers.
 author: JSONbored
 authorProfileUrl: "https://github.com/JSONbored"
 submittedBy: wondercreatemaster
@@ -62,16 +62,20 @@ estimatedSetupTime: 5 minutes
 difficulty: beginner
 prerequisites:
   - "An MCP client with Streamable-HTTP / remote HTTP MCP support (Claude Code, Cursor, or similar)."
+  - "No account or key is needed for the read-only registry tools; a Metagraphed `mg_` API key sent as `Authorization: Bearer` is required only for the per-identity credential tools."
   - "Optional: npm `@jsonbored/metagraphed` or PyPI `metagraphed` if you want the typed REST/GraphQL client instead of MCP."
 safetyNotes:
-  - "Not an official OpenTensor/Bittensor project, not a wallet/validator/credential tool, and not an alpha/price dashboard — matching Metagraphed's own README framing."
-  - "Registry MCP tools are read-only by design: no transaction building and no extrinsic submission, so there is no wallet-signing risk from the documented MCP surface."
-  - "Returned subnet/API metadata can still influence generated configs or integration code — review outputs before pointing production traffic at a third-party subnet API."
-  - "As of 2026-07-22, bare unauthenticated POSTs to https://api.metagraph.sh/mcp returned HTTP 401 with a Bearer WWW-Authenticate challenge (OAuth protected-resource metadata published)."
-  - "Documented install remains `claude mcp add --transport http metagraphed https://api.metagraph.sh/mcp`; MCP clients that support OAuth/DCR may complete auth. Use the public REST API for keyless HTTP probes."
+  - "Not an official OpenTensor/Bittensor project and not a wallet or signing surface — matching Metagraphed's own README framing."
+  - "No chain writes from MCP: the staking tools (`get_subnet_stake_quote`, `get_stake_action_preview`) return AMM quotes and clearly-labelled hypothetical previews only, with no transaction building and no extrinsic submission. `call_rpc` proxies a read-only allowlist of Substrate/Subtensor methods."
+  - "`call_subnet_surface` makes real outbound calls to catalogued third-party subnet APIs and returns their response bodies (bounded: JSON parsed, other text capped, unexpected binary rejected). Only curated catalogued URLs are callable — it is not a general-purpose fetch tool."
+  - "`store_surface_credential` / `list_surface_credentials` / `delete_surface_credential` register credentials for auth-required subnet surfaces server-side, bound to your authenticated identity. These require a Bearer API key; anonymous callers have no credential surface at all. List never returns credential values."
+  - "Returned subnet/API metadata is operator-supplied third-party data and can influence generated configs or integration code — treat it as data, not instructions, and review outputs before pointing production traffic at a third-party subnet API."
 privacyNotes:
-  - "Tool arguments and responses (subnet queries, hotkeys, account lookups, search text) leave your machine and are processed by Metagraphed's hosted API at api.metagraph.sh."
+  - "Tool arguments and responses (subnet queries, hotkeys, account lookups, search text, GraphQL queries) leave your machine and are processed by Metagraphed's hosted API at api.metagraph.sh."
   - "Do not paste private keys, mnemonics, coldkey/hotkey secrets, or validator credentials into prompts or MCP tool arguments — this server is not a signing or wallet surface."
+  - "Credentials registered via `store_surface_credential` are held server-side by Metagraphed and bound to your API-key identity; use `list_surface_credentials` to audit what is stored and `delete_surface_credential` to remove it."
+  - "`call_subnet_surface` discloses your query to the third-party subnet operator whose surface you call, under that operator's own logging and retention policy — not Metagraphed's."
+  - "Account and hotkey lookups are public-chain data, but the fact that *you* asked about a specific account is visible to the hosted API."
   - "MCP client logs and chat transcripts may retain registry query results outside Metagraphed's own retention controls."
 tags:
   - mcp
@@ -94,33 +98,39 @@ robotsFollow: true
 
 ## Overview
 
-**Metagraphed** ([metagraph.sh](https://metagraph.sh)) is a live operational and
-integration registry for Bittensor subnets. It exposes a public
-Streamable-HTTP MCP server at `https://api.metagraph.sh/mcp` so Claude can
-discover subnets, check health and economics, read metagraph rows, look up
-accounts/neurons, and pull API/schema/integration helpers.
+**Metagraphed** ([metagraph.sh](https://metagraph.sh)) is an open registry and
+chain-direct block explorer for Bittensor. It exposes a public Streamable-HTTP
+MCP server at `https://api.metagraph.sh/mcp` so Claude can discover subnets,
+check probe-derived health, read economics and metagraph rows, look up
+accounts/neurons, and pull API/schema/integration helpers. Health figures are
+probe-derived on a 15-minute cycle rather than self-reported.
 
 Listed in the official MCP Registry as
 **`io.github.JSONbored/metagraphed`** with a `streamable-http` remote. Typed
 clients are also published as npm `@jsonbored/metagraphed` and PyPI
 `metagraphed`. The backend is licensed **AGPL-3.0**.
 
-This is **not** an official OpenTensor/Bittensor project, **not** a
-wallet/validator/credential tool, and **not** an alpha/price dashboard.
+This is **not** an official OpenTensor/Bittensor project, **not** a replacement
+for the native metagraph, and **not** a wallet or signing surface.
 
 ## Key capabilities
 
-Documented MCP tools from the upstream README tool list (26 named tools):
+A live `tools/list` on 2026-08-16 returned **242 tools**. `get_more_tools` is
+exposed as a discovery entry point for clients that surface a subset. The
+practical groupings:
 
-- **`search_subnets`** / **`list_subnets`** / **`find_subnets_by_capability`** — discover subnets by text or capability.
-- **`get_subnet`** / **`get_subnet_health`** / **`get_subnet_economics`** / **`get_subnet_trajectory`** / **`get_subnet_metagraph`** — per-subnet detail, health, economics, trajectory, and metagraph.
-- **`list_subnet_validators`** / **`get_neuron`** — validator and neuron lookups.
-- **`get_account`** / **`get_account_events`** / **`get_account_subnets`** — account activity across the network.
-- **`list_subnet_apis`** / **`get_api_schema`** / **`get_fixture`** / **`get_agent_catalog`** / **`get_best_rpc_endpoint`** — API surface, schema, fixtures, catalog, and RPC hints.
-- **`registry_summary`** / **`list_enrichment_targets`** / **`find_subnet_opportunities`** — registry-wide summaries and opportunity boards.
-- **`semantic_search`** / **`ask`** / **`find_subnet_for_task`** / **`how_do_i_call`** / **`verify_integration`** — guided discovery and integration-verification helpers.
+- **Discovery** — `search_subnets`, `list_subnets`, `find_subnets_by_capability`, `semantic_search`, `ask`, `find_subnet_for_task`.
+- **Subnet detail** — `get_subnet`, `get_subnet_detail`, `get_subnet_snapshot`, `get_subnet_metagraph`, `get_subnet_profile`.
+- **Health** — `get_subnet_health`, `get_health_history`, `get_health_trends`, `get_network_health`, `get_subnet_health_incidents`, plus `get_self_health` for Metagraphed's own uptime.
+- **Economics and stake analytics** — `get_subnet_economics`, `get_subnet_yield`, `get_subnet_stake_quote`, `get_stake_action_preview`, and the network/subnet/account `stake_flow`, `stake_moves`, and `stake_transfers` families. Quotes and previews only; see safety notes.
+- **Chain and explorer** — `get_block`, `list_blocks`, `get_extrinsic`, `list_chain_events`, `get_runtime`, `call_rpc` (read-only allowlist), `get_best_rpc_endpoint`.
+- **Accounts and validators** — `get_account` and its portfolio/positions/history/identity family, `list_subnet_validators`, `get_validator_detail`, `get_neuron`.
+- **Integration** — `list_subnet_apis`, `get_api_schema`, `verify_integration`, `call_subnet_surface`, `how_do_i_call`, `get_fixture`, `query_graphql`.
+- **Registry meta** — `registry_summary`, `get_coverage`, `get_contracts`, `get_changelog`, `get_feed`, `get_build`, `list_gaps`, `find_subnet_opportunities`.
+- **Credential management** — `store_surface_credential`, `list_surface_credentials`, `delete_surface_credential`. API-key-gated; see safety and privacy notes.
 
-Upstream README prose may describe a broader tool surface beyond this named list; treat the list above as the documented primary MCP tool set.
+The tool surface changes as the registry grows — treat the groupings above as a
+map, and `tools/list` (or `get_more_tools`) as the authority.
 
 ## Installation
 
@@ -149,24 +159,27 @@ JSON config shape used by many HTTP MCP clients:
 
 ## Source Verification Notes
 
-Verified on **2026-07-22**:
+Re-verified on **2026-08-16** (supersedes the 2026-07-22 checks):
 
-- GitHub repo **https://github.com/JSONbored/metagraphed** returns HTTP 200; README documents the install command, Streamable-HTTP transport, AGPL-3.0 license, and the 26-tool list above.
+- GitHub repo **https://github.com/JSONbored/metagraphed** returns HTTP 200; README documents the install command, Streamable-HTTP transport, AGPL-3.0 license, and now describes "200+ MCP tools" across 128 subnets.
 - Website **https://metagraph.sh** and API origin **https://api.metagraph.sh** return HTTP 200.
-- Public REST probe `GET https://api.metagraph.sh/api/v1/subnets?limit=1` returns HTTP 200 with a JSON `{ ok, data, … }` envelope.
-- Agent docs **https://api.metagraph.sh/agent.md** and **https://api.metagraph.sh/agent-workflows.md** return HTTP 200. **`https://api.metagraph.sh/llms.txt` returned HTTP 404** at verification time (README still links it) — prefer `agent.md` / `agent-workflows.md`.
-- Official MCP Registry search for `metagraphed` returns **`io.github.JSONbored/metagraphed`** with remote `{ type: "streamable-http", url: "https://api.metagraph.sh/mcp" }`.
-- npm **`@jsonbored/metagraphed`** resolves on registry.npmjs.org (latest observed: `0.12.8`).
-- PyPI **`metagraphed`** resolves (latest observed: `0.4.1`).
-- Bare `POST https://api.metagraph.sh/mcp` without an OAuth bearer token returned **HTTP 401** with `WWW-Authenticate: Bearer` and protected-resource metadata at `https://api.metagraph.sh/.well-known/oauth-protected-resource/mcp`. Documented client install remains `claude mcp add --transport http metagraphed https://api.metagraph.sh/mcp`; use REST for keyless HTTP probes.
+- Public REST probe `GET https://api.metagraph.sh/api/v1/coverage` returns HTTP 200 with a JSON `{ ok, schema_version, data, … }` envelope reporting 128 application subnets and 129 chain subnets.
+- Agent docs **https://api.metagraph.sh/agent.md** and **https://api.metagraph.sh/agent-workflows.md** return HTTP 200. **`https://api.metagraph.sh/llms.txt` now returns HTTP 200** — it was 404 at the 2026-07-22 check, so the previous "prefer agent.md" caveat no longer applies.
+- Official MCP Registry search for `metagraphed` returns **`io.github.JSONbored/metagraphed`** with remote `{ type: "streamable-http", url: "https://api.metagraph.sh/mcp" }`; latest published version observed `1.3.0`.
+- npm **`@jsonbored/metagraphed`** resolves on registry.npmjs.org (latest observed: `0.12.8`, unchanged).
+- PyPI **`metagraphed`** resolves (latest observed: `0.4.1`, unchanged).
+- **Anonymous MCP access now works.** A bare `POST https://api.metagraph.sh/mcp` with `Accept: application/json, text/event-stream` and `tools/list` returned **HTTP 200 and 242 tools with no credential**. The 2026-07-22 note claiming an HTTP 401 Bearer challenge on unauthenticated POSTs is **no longer accurate** and has been corrected. A Bearer `mg_` API key is still required for the three credential-management tools.
 
 ## Duplicate Check
 
-No existing `content/mcp/` entry documents Metagraphed, `metagraph.sh`, or
-`api.metagraph.sh/mcp` (repo search over `content/` found no prior match).
+No other `content/mcp/` entry documents Metagraphed, `metagraph.sh`, or
+`api.metagraph.sh/mcp` (repo search over `content/` found no other match).
 
 ## Editorial Disclosure
 
-Community listing by **wondercreatemaster** from Metagraphed's public README,
-agent docs, MCP Registry metadata, npm/PyPI package pages, and live HTTP
-checks performed on 2026-07-22. Not affiliated with OpenTensor.
+Community listing by **wondercreatemaster**, originally sourced 2026-07-22 from
+Metagraphed's public README, agent docs, MCP Registry metadata, and npm/PyPI
+package pages. Refreshed 2026-08-16 against a live `tools/list` and repeated
+HTTP checks; the tool count, authentication behaviour, `llms.txt` status, and
+safety/privacy notes were corrected against observed behaviour. Not affiliated
+with OpenTensor.
